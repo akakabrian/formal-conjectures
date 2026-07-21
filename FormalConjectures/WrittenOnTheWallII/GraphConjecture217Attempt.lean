@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-https://www.apache.org/licenses/LICENSE-2.0
+    https://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,26 +29,50 @@ open Classical SimpleGraph
 
 variable {α : Type*} [Fintype α] [DecidableEq α] [Nontrivial α]
 
+/-- A graph has a Hamiltonian path in the exact form used by Conjecture 217. -/
+abbrev HasHamiltonianPath (G : SimpleGraph α) : Prop :=
+  ∃ a b : α, ∃ p : G.Walk a b, p.IsHamiltonian
+
 /-- The indicator is one exactly in the residue-two branch. -/
+@[category test, AMS 5]
 theorem residueEqTwoIndicator_eq_one_iff (G : SimpleGraph α) [DecidableRel G.Adj] :
     residueEqTwoIndicator G = 1 ↔ residue G = 2 := by
   simp [residueEqTwoIndicator]
 
 /-- The indicator is zero exactly outside the residue-two branch. -/
+@[category test, AMS 5]
 theorem residueEqTwoIndicator_eq_zero_iff (G : SimpleGraph α) [DecidableRel G.Adj] :
     residueEqTwoIndicator G = 0 ↔ residue G ≠ 2 := by
   simp [residueEqTwoIndicator]
 
 /-- Outside the residue-two branch, the conjecture hypothesis reduces to `Ls G ≤ 2`. -/
+@[category test, AMS 5]
 theorem Ls_le_two_of_residue_ne_two (G : SimpleGraph α) [DecidableRel G.Adj]
     (hL : Ls G ≤ 4 * (residueEqTwoIndicator G : ℝ) + 2)
     (hr : residue G ≠ 2) : Ls G ≤ 2 := by
   simpa [residueEqTwoIndicator, hr] using hL
 
 /-- In the residue-two branch, the conjecture hypothesis reduces to `Ls G ≤ 6`. -/
+@[category test, AMS 5]
 theorem Ls_le_six_of_residue_eq_two (G : SimpleGraph α) [DecidableRel G.Adj]
     (hL : Ls G ≤ 4 * (residueEqTwoIndicator G : ℝ) + 2)
     (hr : residue G = 2) : Ls G ≤ 6 := by
-  simpa [residueEqTwoIndicator, hr] using hL
+  norm_num [residueEqTwoIndicator, hr] at hL ⊢
+
+/-- The exact conjecture follows once its two mathematical branches are supplied. -/
+@[category test, AMS 5]
+theorem conjecture217_of_branch_theorems
+    (hNonResidue :
+      ∀ (H : SimpleGraph α) [DecidableRel H.Adj],
+        H.Connected → Ls H ≤ 2 → HasHamiltonianPath H)
+    (hResidueTwo :
+      ∀ (H : SimpleGraph α) [DecidableRel H.Adj],
+        H.Connected → residue H = 2 → Ls H ≤ 6 → HasHamiltonianPath H)
+    (G : SimpleGraph α) [DecidableRel G.Adj] (h : G.Connected)
+    (hL : Ls G ≤ 4 * (residueEqTwoIndicator G : ℝ) + 2) :
+    HasHamiltonianPath G := by
+  by_cases hr : residue G = 2
+  · exact hResidueTwo G h hr (Ls_le_six_of_residue_eq_two G hL hr)
+  · exact hNonResidue G h (Ls_le_two_of_residue_ne_two G hL hr)
 
 end WrittenOnTheWallII.GraphConjecture217
