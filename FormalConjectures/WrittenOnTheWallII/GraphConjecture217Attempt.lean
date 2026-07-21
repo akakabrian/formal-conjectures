@@ -76,6 +76,24 @@ theorem spanningTree_leafCount_le_Ls (G : SimpleGraph α) [DecidableRel G.Adj]
       (Finset.card_le_univ (S.verts.toFinset.filter (fun v => S.degree v = 1)))
   · exact ⟨T, hT, rfl⟩
 
+/-- A connected graph with `Ls ≤ 2` has a concrete spanning tree with at most two leaves. -/
+@[category test, AMS 5]
+theorem exists_spanningTree_leafCount_le_two (G : SimpleGraph α) [DecidableRel G.Adj]
+    (hG : G.Connected) (hL : Ls G ≤ 2) :
+    ∃ T : G.Subgraph,
+      T.IsSpanning ∧ IsTree T.coe ∧
+        (T.verts.toFinset.filter (fun v => T.degree v = 1)).card ≤ 2 := by
+  classical
+  obtain ⟨T, hTG, hTtree⟩ := hG.exists_isTree_le
+  let S : G.Subgraph := T.toSubgraph hTG
+  have hSspan : S.IsSpanning := SimpleGraph.toSubgraph.isSpanning T hTG
+  have hStree : IsTree S.coe := by
+    apply (S.spanningCoeEquivCoeOfSpanning hSspan).isTree_iff.mp
+    simpa [S, SimpleGraph.toSubgraph] using hTtree
+  have hcountR := spanningTree_leafCount_le_Ls G S ⟨hSspan, hStree⟩
+  refine ⟨S, hSspan, hStree, ?_⟩
+  exact_mod_cast hcountR.trans hL
+
 /-- The exact conjecture follows once its two mathematical branches are supplied. -/
 @[category test, AMS 5]
 theorem conjecture217_of_branch_theorems
