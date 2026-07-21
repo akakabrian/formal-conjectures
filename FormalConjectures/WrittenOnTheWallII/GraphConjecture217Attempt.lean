@@ -177,19 +177,124 @@ theorem tree_degree_le_two_of_leafCount_le_two (H : SimpleGraph α) [DecidableRe
         simp [hw1]
         omega
       · simp [hw1, hwv]
+        have hwpos : 1 ≤ H.degree w := hdeg1 w
         have hw2 : 2 ≤ H.degree w := by omega
         omega
   have hsumle := Finset.sum_le_sum (fun w _ => hterm w)
   rw [hsumZ] at hsumle
+  have hsplit (w : α) :
+      (if H.degree w = 1 then (1 : ℤ) else if w = v then -1 else 0) =
+        (if H.degree w = 1 then 1 else 0) + (if w = v then -1 else 0) := by
+    by_cases hw1 : H.degree w = 1
+    · have hwv : w ≠ v := by
+        rintro rfl
+        omega
+      simp [hw1, hwv]
+    · simp [hw1]
   have hright :
       ∑ w : α, (if H.degree w = 1 then (1 : ℤ) else if w = v then -1 else 0) =
         ((Finset.univ.filter (fun w => H.degree w = 1)).card : ℤ) - 1 := by
-    rw [Finset.sum_ite_irrel, Finset.sum_ite_irrel]
-    simp [hv3.ne']
+    calc
+      _ = ∑ w : α,
+          ((if H.degree w = 1 then (1 : ℤ) else 0) + (if w = v then -1 else 0)) := by
+            apply Finset.sum_congr rfl
+            intro w hw
+            exact hsplit w
+      _ = (∑ w : α, if H.degree w = 1 then (1 : ℤ) else 0) +
+          (∑ w : α, if w = v then (-1 : ℤ) else 0) := Finset.sum_add_distrib
+      _ = ((Finset.univ.filter (fun w => H.degree w = 1)).card : ℤ) - 1 := by
+            simp
   rw [hright] at hsumle
   have hLeavesZ : ((Finset.univ.filter (fun w => H.degree w = 1)).card : ℤ) ≤ 2 := by
     exact_mod_cast hLeaves
   omega
+
+/-- A finite connected graph of maximum degree at most two has a Hamiltonian path. -/
+@[category test, AMS 5]
+theorem hasHamiltonianPath_of_connected_degree_le_two
+    (H : SimpleGraph α) [DecidableRel H.Adj]
+    (hH : H.Connected) (hdeg : ∀ v, H.degree v ≤ 2) :
+    HasHamiltonianPath H := by
+  classical
+  obtain ⟨u, v, p, hp, hmax⟩ :=
+    Walk.exists_isPath_forall_isPath_length_le_length H
+  refine ⟨u, v, p, hp.isHamiltonian_of_mem ?_⟩
+  intro w
+  by_contra hw
+  obtain ⟨q, hq⟩ := hH.exists_isPath u w
+  obtain ⟨d, hd, hdx, hdy⟩ :=
+    q.exists_boundary_dart {x | x ∈ p.support} (by simp) (by simpa)
+  simp only [Set.mem_setOf_eq] at hdx hdy
+  by_cases hxu : d.fst = u
+  · have hyu : H.Adj d.snd u := by simpa [hxu] using d.adj.symm
+    have hnew : (p.cons hyu).IsPath := hp.cons hdy
+    have := hmax d.snd v (p.cons hyu) hnew
+    simp at this
+  by_cases hxv : d.fst = v
+  · have hvy : H.Adj v d.snd := by simpa [hxv] using d.adj
+    have hnew : (p.concat hvy).IsPath := hp.concat hdy hvy
+    have := hmax u d.snd (p.concat hvy) hnew
+    simp at this
+  obtain ⟨p₁, p₂, hp₁, hp₂, hp_eq⟩ :=
+    hp.mem_support_iff_exists_append.mp hdx
+  have hp_app : (p₁.append p₂).IsPath := hp_eq ▸ hp
+  have hp₁_ne : ¬p₁.Nil := Walk.not_nil_of_ne hxu.symm
+  have hp₂_ne : ¬p₂.Nil := Walk.not_nil_of_ne hxv
+  have hxa : H.Adj d.fst p₁.penultimate := (p₁.adj_penultimate hp₁_ne).symm
+  have hxb : H.Adj d.fst p₂.snd := p₂.adj_snd hp₂_ne
+  have ha₁ : p₁.penultimate ∈ p₁.support := p₁.getVert_mem_support _
+  have hb₂ : p₂.snd ∈ p₂.support := p₂.getVert_mem_support 1
+  have hab : p₁.penultimate ≠ p₂.snd :=
+    hp_app.ne_of_mem_support_of_append hxb.ne' ha₁ hb₂
+  have ha : p₁.penultimate ∈ p.support := by
+    rw [hp_eq]
+    exact p₁.subset_support_append_left p₂ ha₁
+  have hb : p₂.snd ∈ p.support := by
+    rw [hp_eq]
+    exact p₁.subset_support_append_right p₂ hb₂
+  have hay : p₁.penultimate ≠ d.snd := fun h ↦ hdy (h ▸ ha)
+  have hby : p₂.snd ≠ d.snd := fun h ↦ hdy (h ▸ hb)
+  have hsub :
+      ({p₁.penultimate, p₂.snd, d.snd} : Finset α) ⊆ H.neighborFinset d.fst := by
+    intro z hz
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hz
+    rcases hz with rfl | rfl | rfl
+    · simpa using hxa
+    · simpa using hxb
+    · simpa using d.adj
+  have hcard := Finset.card_le_card hsub
+  have hthree : ({p₁.penultimate, p₂.snd, d.snd} : Finset α).card = 3 := by
+    simp [hab, hay, hby]
+  rw [hthree, H.card_neighborFinset_eq_degree] at hcard
+  have := hdeg d.fst
+  omega
+
+/-- The `Ls ≤ 2` branch of Conjecture 217. -/
+@[category test, AMS 5]
+theorem hasHamiltonianPath_of_Ls_le_two
+    (G : SimpleGraph α) [DecidableRel G.Adj]
+    (hG : G.Connected) (hL : Ls G ≤ 2) :
+    HasHamiltonianPath G := by
+  classical
+  obtain ⟨T, hTspan, hTtree, hTleaves⟩ :=
+    exists_spanningTree_leafCount_le_two G hG hL
+  have hTreeSpan : IsTree T.spanningCoe :=
+    (T.spanningCoeEquivCoeOfSpanning hTspan).isTree_iff.mpr hTtree
+  have hLeavesSpan :
+      (Finset.univ.filter (fun v => T.spanningCoe.degree v = 1)).card ≤ 2 := by
+    simpa [hTspan.verts_eq_univ] using hTleaves
+  have hdegSpan : ∀ v, T.spanningCoe.degree v ≤ 2 :=
+    tree_degree_le_two_of_leafCount_le_two T.spanningCoe hTreeSpan hLeavesSpan
+  obtain ⟨a, b, p, hp⟩ :=
+    hasHamiltonianPath_of_connected_degree_le_two T.spanningCoe hTreeSpan.isConnected hdegSpan
+  let f : T.spanningCoe →g G := Hom.ofLE T.spanningCoe_le
+  have hf : Function.Bijective f := by
+    constructor
+    · intro x y hxy
+      exact hxy
+    · intro y
+      exact ⟨y, rfl⟩
+  exact ⟨f a, f b, p.map f, hp.map f hf⟩
 
 /-- The exact conjecture follows once its two mathematical branches are supplied. -/
 @[category test, AMS 5]
