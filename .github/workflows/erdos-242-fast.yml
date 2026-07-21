@@ -18,11 +18,13 @@ jobs:
       - uses: leanprover/lean-action@v1
         with:
           auto-config: false
-          build: true
+          build: false
           test: false
           lint: false
           mk_all-check: false
-          build-args: >-
-            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Basic
-            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.ElementaryFamilies
+      - name: Build Erdős 242 modules
+        run: |
+          lake build \
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Basic \
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.ElementaryFamilies \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.TypeIIFactorPair
