@@ -60,6 +60,20 @@ theorem Ls_le_six_of_residue_eq_two (G : SimpleGraph α) [DecidableRel G.Adj]
   norm_num [residueEqTwoIndicator, hr] at hL
   exact hL
 
+/-- Every individual spanning-tree leaf count is bounded by the `sSup` defining `Ls`. -/
+@[category test, AMS 5]
+theorem spanningTree_leafCount_le_Ls (G : SimpleGraph α) [DecidableRel G.Adj]
+    (T : G.Subgraph) (hT : T.IsSpanning ∧ IsTree T.coe) :
+    ((T.verts.toFinset.filter (fun v => T.degree v = 1)).card : ℝ) ≤ Ls G := by
+  classical
+  unfold Ls
+  apply le_csSup
+  · refine ⟨(Fintype.card α : ℝ), ?_⟩
+    rintro x ⟨S, hS, rfl⟩
+    exact_mod_cast
+      (Finset.card_le_univ (S.verts.toFinset.filter (fun v => S.degree v = 1)))
+  · exact ⟨T, hT, rfl⟩
+
 /-- The exact conjecture follows once its two mathematical branches are supplied. -/
 @[category test, AMS 5]
 theorem conjecture217_of_branch_theorems
