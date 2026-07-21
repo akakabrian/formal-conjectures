@@ -85,8 +85,9 @@ theorem exists_spanningTree_leafCount_le_two (G : SimpleGraph α) [DecidableRel 
         (T.verts.toFinset.filter (fun v => T.degree v = 1)).card ≤ 2 := by
   classical
   obtain ⟨T, hTG, hTtree⟩ := hG.exists_isTree_le
-  let S : G.Subgraph := T.toSubgraph hTG
-  have hSspan : S.IsSpanning := SimpleGraph.toSubgraph.isSpanning T hTG
+  let S : G.Subgraph := SimpleGraph.toSubgraph (G := G) T hTG
+  have hSspan : S.IsSpanning := by
+    simpa [S] using SimpleGraph.toSubgraph.isSpanning T hTG
   have hStree : IsTree S.coe := by
     apply (S.spanningCoeEquivCoeOfSpanning hSspan).isTree_iff.mp
     simpa [S, SimpleGraph.toSubgraph] using hTtree
