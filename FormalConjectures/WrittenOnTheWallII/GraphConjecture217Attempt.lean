@@ -141,6 +141,56 @@ theorem edge_threshold_of_cauchy (n m : ℕ) (hn : 12 ≤ n)
   have hn1 : 1 ≤ n := by omega
   exact (quadratic_density_threshold n hn).trans (edge_lower_bound_of_cauchy n m hn1 h)
 
+/-- A finite nontrivial tree with at most two leaves has maximum degree at most two. -/
+@[category test, AMS 5]
+theorem tree_degree_le_two_of_leafCount_le_two (H : SimpleGraph α) [DecidableRel H.Adj]
+    (hT : IsTree H)
+    (hLeaves : (Finset.univ.filter (fun v => H.degree v = 1)).card ≤ 2) :
+    ∀ v, H.degree v ≤ 2 := by
+  classical
+  intro v
+  by_contra hv
+  have hv3 : 3 ≤ H.degree v := by omega
+  have hmin : H.minDegree = 1 := hT.minDegree_eq_one_of_nontrivial
+  have hdeg1 (w : α) : 1 ≤ H.degree w := by
+    rw [← hmin]
+    exact H.minDegree_le_degree w
+  have hsumdeg : ∑ w : α, H.degree w = 2 * H.edgeFinset.card :=
+    H.sum_degrees_eq_twice_card_edges
+  have hedge : H.edgeFinset.card + 1 = Fintype.card α := hT.card_edgeFinset
+  have hsumZ : ∑ w : α, ((2 : ℤ) - (H.degree w : ℤ)) = 2 := by
+    rw [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ]
+    simp only [nsmul_eq_mul]
+    have hsumdegZ : (∑ w : α, (H.degree w : ℤ)) = 2 * (H.edgeFinset.card : ℤ) := by
+      exact_mod_cast hsumdeg
+    rw [hsumdegZ]
+    have hedgeZ : (H.edgeFinset.card : ℤ) + 1 = Fintype.card α := by
+      exact_mod_cast hedge
+    omega
+  have hterm (w : α) :
+      ((2 : ℤ) - (H.degree w : ℤ)) ≤
+        (if H.degree w = 1 then 1 else if w = v then -1 else 0) := by
+    by_cases hw1 : H.degree w = 1
+    · simp [hw1]
+    · by_cases hwv : w = v
+      · subst w
+        simp [hw1]
+        omega
+      · simp [hw1, hwv]
+        have hw2 : 2 ≤ H.degree w := by omega
+        omega
+  have hsumle := Finset.sum_le_sum (fun w _ => hterm w)
+  rw [hsumZ] at hsumle
+  have hright :
+      ∑ w : α, (if H.degree w = 1 then (1 : ℤ) else if w = v then -1 else 0) =
+        ((Finset.univ.filter (fun w => H.degree w = 1)).card : ℤ) - 1 := by
+    rw [Finset.sum_ite_irrel, Finset.sum_ite_irrel]
+    simp [hv3.ne']
+  rw [hright] at hsumle
+  have hLeavesZ : ((Finset.univ.filter (fun w => H.degree w = 1)).card : ℤ) ≤ 2 := by
+    exact_mod_cast hLeaves
+  omega
+
 /-- The exact conjecture follows once its two mathematical branches are supplied. -/
 @[category test, AMS 5]
 theorem conjecture217_of_branch_theorems
