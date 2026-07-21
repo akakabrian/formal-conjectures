@@ -95,6 +95,52 @@ theorem exists_spanningTree_leafCount_le_two (G : SimpleGraph α) [DecidableRel 
   refine ⟨S, hSspan, hStree, ?_⟩
   exact_mod_cast hcountR.trans hL
 
+/-- A connected graph with `Ls ≤ 6` has a concrete spanning tree with at most six leaves. -/
+@[category test, AMS 5]
+theorem exists_spanningTree_leafCount_le_six (G : SimpleGraph α) [DecidableRel G.Adj]
+    (hG : G.Connected) (hL : Ls G ≤ 6) :
+    ∃ T : G.Subgraph,
+      T.IsSpanning ∧ IsTree T.coe ∧
+        (T.verts.toFinset.filter (fun v => T.degree v = 1)).card ≤ 6 := by
+  classical
+  obtain ⟨T, hTG, hTtree⟩ := hG.exists_isTree_le
+  let S : G.Subgraph := SimpleGraph.toSubgraph (G := G) T hTG
+  have hSspan : S.IsSpanning := by
+    simpa [S] using SimpleGraph.toSubgraph.isSpanning T hTG
+  have hStree : IsTree S.coe := by
+    apply (S.spanningCoeEquivCoeOfSpanning hSspan).isTree_iff.mp
+    simpa [S, SimpleGraph.toSubgraph] using hTtree
+  have hcountR := spanningTree_leafCount_le_Ls G S ⟨hSspan, hStree⟩
+  refine ⟨S, hSspan, hStree, ?_⟩
+  exact_mod_cast hcountR.trans hL
+
+/-- The elementary quadratic threshold used after the residue/Caro--Wei estimate. -/
+@[category test, AMS 5]
+theorem quadratic_density_threshold (n : ℕ) (hn : 12 ≤ n) :
+    (n : ℝ) + 15 ≤ (n : ℝ) * ((n : ℝ) - 2) / 4 := by
+  have hnR : (12 : ℝ) ≤ (n : ℝ) := by exact_mod_cast hn
+  have hprod : 0 ≤ ((n : ℝ) - 12) * ((n : ℝ) + 6) :=
+    mul_nonneg (sub_nonneg.mpr hnR) (by positivity)
+  nlinarith
+
+/-- Rearrangement of the Cauchy estimate `n²/(2m+n) ≤ 2`. -/
+@[category test, AMS 5]
+theorem edge_lower_bound_of_cauchy (n m : ℕ) (hn : 1 ≤ n)
+    (h : (n : ℝ) ^ 2 / (2 * (m : ℝ) + (n : ℝ)) ≤ 2) :
+    (n : ℝ) * ((n : ℝ) - 2) / 4 ≤ (m : ℝ) := by
+  have hnR : 0 < (n : ℝ) := by exact_mod_cast hn
+  have hden : 0 < 2 * (m : ℝ) + (n : ℝ) := by positivity
+  have hmul := (div_le_iff₀ hden).mp h
+  nlinarith
+
+/-- Combining the preceding arithmetic steps gives the DJS edge threshold at order at least twelve. -/
+@[category test, AMS 5]
+theorem edge_threshold_of_cauchy (n m : ℕ) (hn : 12 ≤ n)
+    (h : (n : ℝ) ^ 2 / (2 * (m : ℝ) + (n : ℝ)) ≤ 2) :
+    (n : ℝ) + 15 ≤ (m : ℝ) := by
+  have hn1 : 1 ≤ n := by omega
+  exact (quadratic_density_threshold n hn).trans (edge_lower_bound_of_cauchy n m hn1 h)
+
 /-- The exact conjecture follows once its two mathematical branches are supplied. -/
 @[category test, AMS 5]
 theorem conjecture217_of_branch_theorems
