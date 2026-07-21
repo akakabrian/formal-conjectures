@@ -4,59 +4,66 @@ on:
   push:
     branches:
       - codex/wowii-217-formalization
+    paths-ignore:
+      - 'ci/**'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  verify:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Lean and warm dependencies
-        id: lean-action
-        continue-on-error: true
-        uses: leanprover/lean-action@v1
         with:
-          auto-config: false
-          build: true
-          build-args: "+FormalConjectures.WrittenOnTheWallII.GraphConjecture217Attempt"
-          test: false
-          lint: false
-          use-mathlib-cache: true
+          fetch-depth: 0
 
-      - name: Capture exact target build transcript
-        if: always()
+      - name: Install elan
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf \
+            https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Resolve dependencies
+        run: lake update
+
+      - name: Download Mathlib cache
+        run: lake exe cache get
+
+      - name: Verify and capture compiler log
+        id: verify
         shell: bash
         run: |
           mkdir -p ci
-          {
-            echo "commit=${GITHUB_SHA}"
-            echo "lean_action_outcome=${{ steps.lean-action.outcome }}"
-            date -u +"started_utc=%Y-%m-%dT%H:%M:%SZ"
-          } > ci/wowii217-status.txt
-
           set +e
-          lake build +FormalConjectures.WrittenOnTheWallII.GraphConjecture217Attempt \
-            > ci/wowii217-build.log 2>&1
-          code=$?
+          {
+            echo '$ lake build +FormalConjectures.WrittenOnTheWallII.GraphConjecture217Attempt'
+            lake build +FormalConjectures.WrittenOnTheWallII.GraphConjecture217Attempt
+          } > ci/wowii217-build.log 2>&1
+          status=$?
           set -e
 
-          echo "build_exit_code=${code}" >> ci/wowii217-status.txt
-          date -u +"finished_utc=%Y-%m-%dT%H:%M:%SZ" >> ci/wowii217-status.txt
+          {
+            echo "commit=${GITHUB_SHA}"
+            echo "build_exit_code=${status}"
+            date -u +"finished_utc=%Y-%m-%dT%H:%M:%SZ"
+          } > ci/wowii217-status.txt
           sha256sum ci/wowii217-build.log ci/wowii217-status.txt > ci/wowii217.sha256
+          echo "exit_status=$status" >> "$GITHUB_OUTPUT"
 
-      - name: Commit compiler transcript to isolated branch
+      - name: Publish compiler transcript on isolated branch
         if: always()
-        shell: bash
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ci/wowii217-build.log ci/wowii217-status.txt ci/wowii217.sha256
-          if ! git diff --cached --quiet; then
-            git commit -m "ci: record WOWII 217 Lean transcript [skip ci]"
-            git push
-          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f ci/wowii217-build.log ci/wowii217-status.txt ci/wowii217.sha256
+          git commit -m "ci: publish WOWII 217 Lean transcript [skip ci]" || true
+          git push origin HEAD:${GITHUB_REF_NAME}
+
+      - name: Fail job when Lean failed
+        if: steps.verify.outputs.exit_status != '0'
+        run: exit 1
