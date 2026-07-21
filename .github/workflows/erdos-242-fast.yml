@@ -1,0 +1,28 @@
+name: Erdős 242 targeted Lean check
+
+on:
+  push:
+    branches: ["erdos-242-phase1"]
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "FormalConjecturesForMathlib/NumberTheory/ErdosStraus/**"
+      - ".github/workflows/erdos-242-fast.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leanprover/lean-action@v1
+        with:
+          auto-config: false
+          build: true
+          test: false
+          lint: false
+          mk_all-check: false
+          build-args: >-
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Basic
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.ElementaryFamilies
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.TypeIIFactorPair
