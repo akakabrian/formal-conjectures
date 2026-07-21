@@ -1,0 +1,24 @@
+name: WOWII 217 Lean
+
+on:
+  push:
+    branches:
+      - codex/wowii-217-formalization
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leanprover/lean-action@v1
+        with:
+          auto-config: false
+          build: true
+          build-args: "+FormalConjectures.WrittenOnTheWallII.GraphConjecture217Attempt"
+          test: false
+          lint: false
+          use-mathlib-cache: true
