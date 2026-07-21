@@ -57,7 +57,8 @@ theorem Ls_le_two_of_residue_ne_two (G : SimpleGraph α) [DecidableRel G.Adj]
 theorem Ls_le_six_of_residue_eq_two (G : SimpleGraph α) [DecidableRel G.Adj]
     (hL : Ls G ≤ 4 * (residueEqTwoIndicator G : ℝ) + 2)
     (hr : residue G = 2) : Ls G ≤ 6 := by
-  norm_num [residueEqTwoIndicator, hr] at hL ⊢
+  norm_num [residueEqTwoIndicator, hr] at hL
+  exact hL
 
 /-- The exact conjecture follows once its two mathematical branches are supplied. -/
 @[category test, AMS 5]
