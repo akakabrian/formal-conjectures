@@ -33,23 +33,33 @@ namespace ErdosStraus
 theorem hasDistinctDecomposition_of_mod_twenty_four_ne_one
     (n : ℕ) (hn : 2 < n) (hmod : n % 24 ≠ 1) :
     HasDistinctDecomposition n := by
+  have hdiv24 := Nat.mod_add_div n 24
+  have hdiv2 := Nat.mod_add_div n 2
+  have hdiv3 := Nat.mod_add_div n 3
+  have hdiv4 := Nat.mod_add_div n 4
+  have hdiv8 := Nat.mod_add_div n 8
   have hclasses :
       n % 2 = 0 ∨ n % 3 = 0 ∨ n % 3 = 2 ∨ n % 4 = 3 ∨ n % 8 = 5 := by
     omega
   rcases hclasses with h2 | h3 | h32 | h43 | h85
-  · obtain ⟨m, hm⟩ : ∃ m : ℕ, n = 2 * m := by omega
+  · obtain ⟨m, hm⟩ : ∃ m : ℕ, n = 2 * m := by
+      exact ⟨n / 2, by omega⟩
     subst n
     exact even_family m (by omega)
-  · obtain ⟨m, hm⟩ : ∃ m : ℕ, n = m * 3 := by omega
+  · obtain ⟨m, hm⟩ : ∃ m : ℕ, n = m * 3 := by
+      exact ⟨n / 3, by omega⟩
     subst n
     exact (mod_four_three_family 0).scale (by omega)
-  · obtain ⟨k, hk⟩ : ∃ k : ℕ, n = 3 * k + 2 := by omega
+  · obtain ⟨k, hk⟩ : ∃ k : ℕ, n = 3 * k + 2 := by
+      exact ⟨n / 3, by omega⟩
     subst n
     exact mod_three_two_family k (by omega)
-  · obtain ⟨k, hk⟩ : ∃ k : ℕ, n = 4 * k + 3 := by omega
+  · obtain ⟨k, hk⟩ : ∃ k : ℕ, n = 4 * k + 3 := by
+      exact ⟨n / 4, by omega⟩
     subst n
     exact mod_four_three_family k
-  · obtain ⟨k, hk⟩ : ∃ k : ℕ, n = 8 * k + 5 := by omega
+  · obtain ⟨k, hk⟩ : ∃ k : ℕ, n = 8 * k + 5 := by
+      exact ⟨n / 8, by omega⟩
     subst n
     exact mod_eight_five_family k
 
