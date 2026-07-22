@@ -1,0 +1,17 @@
+name: WOWII Conjecture 2 Alternative Proof
+
+on:
+  push:
+    branches:
+      - agent/wow2-triangle-free-proof
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: leanprover/lean-action@v1
