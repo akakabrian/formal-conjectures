@@ -1,0 +1,48 @@
+name: Verify WOWII 59 counterexample
+
+on:
+  push:
+    branches:
+      - agent/wowii-59-kernel-check
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan
+        run: |
+          set -o pipefail
+          curl -sSfL https://github.com/leanprover/elan/releases/download/v1.4.2/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
+          ./elan-init -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Resolve dependencies
+        run: lake update
+
+      - name: Download Mathlib cache
+        run: lake exe cache get
+
+      - name: Kernel-check certificate
+        shell: bash
+        run: |
+          set -o pipefail
+          {
+            echo '$ lake build FormalConjectures.WrittenOnTheWallII.GraphConjecture59Counterexample'
+            lake build FormalConjectures.WrittenOnTheWallII.GraphConjecture59Counterexample
+            echo '$ lake env lean -DwarningAsError=true WOW59Check.lean'
+            lake env lean -DwarningAsError=true WOW59Check.lean
+          } 2>&1 | tee lean-ci.log
+
+      - name: Upload compiler log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wow59-lean-ci-log-${{ github.run_id }}
+          path: lean-ci.log
