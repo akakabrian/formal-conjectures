@@ -180,7 +180,10 @@ theorem tree_degree_le_two_of_leafCount_le_two (H : SimpleGraph α) [DecidableRe
         have hwpos : 1 ≤ H.degree w := hdeg1 w
         have hw2 : 2 ≤ H.degree w := by omega
         omega
-  have hsumle := Finset.sum_le_sum (fun w _ => hterm w)
+  have hsumle :
+      (∑ w : α, ((2 : ℤ) - (H.degree w : ℤ))) ≤
+        ∑ w : α, (if H.degree w = 1 then 1 else if w = v then -1 else 0) := by
+    exact Finset.sum_le_sum (fun w _ => hterm w)
   rw [hsumZ] at hsumle
   have hsplit (w : α) :
       (if H.degree w = 1 then (1 : ℤ) else if w = v then -1 else 0) =
@@ -238,7 +241,7 @@ theorem hasHamiltonianPath_of_connected_degree_le_two
   obtain ⟨p₁, p₂, hp₁, hp₂, hp_eq⟩ :=
     hp.mem_support_iff_exists_append.mp hdx
   have hp_app : (p₁.append p₂).IsPath := hp_eq ▸ hp
-  have hp₁_ne : ¬p₁.Nil := Walk.not_nil_of_ne hxu.symm
+  have hp₁_ne : ¬p₁.Nil := Walk.not_nil_of_ne (Ne.symm hxu)
   have hp₂_ne : ¬p₂.Nil := Walk.not_nil_of_ne hxv
   have hxa : H.Adj d.fst p₁.penultimate := (p₁.adj_penultimate hp₁_ne).symm
   have hxb : H.Adj d.fst p₂.snd := p₂.adj_snd hp₂_ne
