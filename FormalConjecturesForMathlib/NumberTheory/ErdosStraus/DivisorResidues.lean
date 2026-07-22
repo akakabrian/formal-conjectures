@@ -35,11 +35,11 @@ def HasOppositeCoprimeDivisors (x d : ℕ) : Prop :=
 
 /--
 A normalized opposite-divisor pair gives a strictly ordered Type-II
-Erdős–Straus certificate whenever `3 ≤ d < p` and `p+d=4x`.
+Erdős–Straus certificate whenever `d < p` and `p+d=4x`.
 -/
 theorem oppositeCoprimeDivisors_hasDistinctDecomposition
     (p d x : ℕ)
-    (hp : 0 < p) (hx : 0 < x) (hd : 3 ≤ d) (hdp : d < p)
+    (hp : 0 < p) (hx : 0 < x) (hdp : d < p)
     (hpd : p + d = 4 * x)
     (h : HasOppositeCoprimeDivisors x d) :
     HasDistinctDecomposition p := by
