@@ -1,0 +1,84 @@
+name: WOWII 217 Patch Normalization
+
+on:
+  push:
+    branches:
+      - codex/wowii-217-formalization
+    paths-ignore:
+      - 'ci/**'
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply exact normalization patch
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("FormalConjectures/WrittenOnTheWallII/GraphConjecture217Attempt.lean")
+          text = path.read_text()
+          old = """      _ = ((Finset.univ.filter (fun w => H.degree w = 1)).card : ℤ) - 1 := by
+                    simp
+          """
+          new = """      _ = ((Finset.univ.filter (fun w => H.degree w = 1)).card : ℤ) - 1 := by
+                    simpa [sub_eq_add_neg]
+          """
+          if old in text:
+              path.write_text(text.replace(old, new, 1))
+          elif new not in text:
+              raise SystemExit("Expected normalization site not found")
+          PY
+
+      - name: Install elan
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf \
+            https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Resolve dependencies and cache
+        run: |
+          lake update
+          lake exe cache get
+
+      - name: Build exact target
+        id: verify
+        shell: bash
+        run: |
+          mkdir -p ci
+          set +e
+          lake build +FormalConjectures.WrittenOnTheWallII.GraphConjecture217Attempt \
+            > ci/wowii217-build.log 2>&1
+          status=$?
+          set -e
+          {
+            echo "commit=${GITHUB_SHA}"
+            echo "build_exit_code=${status}"
+            date -u +"finished_utc=%Y-%m-%dT%H:%M:%SZ"
+          } > ci/wowii217-status.txt
+          sha256sum ci/wowii217-build.log ci/wowii217-status.txt > ci/wowii217.sha256
+          echo "exit_status=$status" >> "$GITHUB_OUTPUT"
+
+      - name: Preserve patched source and transcript
+        if: always()
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f \
+            FormalConjectures/WrittenOnTheWallII/GraphConjecture217Attempt.lean \
+            ci/wowii217-build.log ci/wowii217-status.txt ci/wowii217.sha256
+          git commit -m "ci: preserve normalized WOWII 217 source [skip ci]" || true
+          git push origin HEAD:${GITHUB_REF_NAME}
+
+      - name: Fail when Lean failed
+        if: steps.verify.outputs.exit_status != '0'
+        run: exit 1
