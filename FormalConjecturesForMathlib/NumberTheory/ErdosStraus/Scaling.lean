@@ -46,7 +46,8 @@ theorem HasDistinctDecomposition.scale {n m : ℕ}
     (h : HasDistinctDecomposition n) (hm : 0 < m) :
     HasDistinctDecomposition (m * n) := by
   rcases h with ⟨x, y, z, hx, hxy, hyz, hEq⟩
-  refine ⟨m * x, m * y, m * z, by positivity, ?_, ?_, ?_⟩
+  have hmx : 0 < m * x := by positivity
+  refine ⟨m * x, m * y, m * z, by omega, ?_, ?_, ?_⟩
   · exact (Nat.mul_lt_mul_left hm).2 hxy
   · exact (Nat.mul_lt_mul_left hm).2 hyz
   · calc
