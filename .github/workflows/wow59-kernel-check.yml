@@ -1,5 +1,6 @@
 name: WOWII 59 Lean
 
+# Isolated branch-push harness for the structural, axiom-free counterexample certificate.
 concurrency:
   group: wowii59-kernel-check
   cancel-in-progress: true
@@ -10,9 +11,6 @@ on:
       - agent/wowii-59-kernel-check
     paths-ignore:
       - 'ci/**'
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
