@@ -29,7 +29,9 @@ jobs:
           lake build \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Basic \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.ElementaryFamilies \
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Scaling \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.TypeIIFactorPair \
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorResidues \
             > erdos-242-build.log 2>&1
       - name: Upload diagnostics
         if: always()
