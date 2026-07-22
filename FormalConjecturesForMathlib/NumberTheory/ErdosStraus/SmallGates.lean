@@ -32,7 +32,9 @@ namespace ErdosStraus
 theorem oppositeCoprimeDivisors_three_of_divisor_mod_three_two
     (x q : ℕ) (hq : q ∣ x) (hqmod : q % 3 = 2) :
     HasOppositeCoprimeDivisors x 3 := by
-  obtain ⟨k, hk⟩ : ∃ k : ℕ, q = 3 * k + 2 := by omega
+  have hqdiv := Nat.mod_add_div q 3
+  obtain ⟨k, hk⟩ : ∃ k : ℕ, q = 3 * k + 2 := by
+    exact ⟨q / 3, by omega⟩
   refine ⟨1, q, by omega, by omega, by simp, by simp, hq, ?_⟩
   refine ⟨k + 1, ?_⟩
   omega
