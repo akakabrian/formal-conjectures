@@ -1,5 +1,5 @@
 /-
-Copyright 2026 Brian Akaka
+Copyright 2025 The Formal Conjectures Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,6 +22,10 @@ import FormalConjecturesUtil
 This file develops an independent proof route based on a maximum-edge
 triangle-free spanning subgraph. It intentionally does not import or reuse the
 AlphaProof Nexus proof of the conjecture.
+
+The route was developed by Brian Akaka with ChatGPT before the separate
+AlphaProof Nexus artifact was located. A final submission should acknowledge
+that earlier formal result and describe this file as an alternative proof.
 
 The planned reduction is as follows.
 
