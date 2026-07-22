@@ -52,4 +52,22 @@ theorem HasDistinctDecomposition.hasDecomposition
   rcases h with ⟨x, y, z, hx, hxy, hyz, hEq⟩
   exact ⟨x, y, z, by omega, by omega, by omega, hEq⟩
 
+/-- A strict polynomial certificate implies the usual rational unit-fraction identity. -/
+theorem HasDistinctDecomposition.toRational
+    {n : ℕ} (hn : 0 < n) (h : HasDistinctDecomposition n) :
+    ∃ x y z : ℕ, 1 ≤ x ∧ x < y ∧ y < z ∧
+      (4 / n : ℚ) = 1 / x + 1 / y + 1 / z := by
+  rcases h with ⟨x, y, z, hx, hxy, hyz, hEq⟩
+  refine ⟨x, y, z, hx, hxy, hyz, ?_⟩
+  have hnx : (n : ℚ) ≠ 0 := by exact_mod_cast (Nat.ne_of_gt hn)
+  have hxx : (x : ℚ) ≠ 0 := by exact_mod_cast (Nat.ne_of_gt (by omega : 0 < x))
+  have hyx : (y : ℚ) ≠ 0 := by exact_mod_cast (Nat.ne_of_gt (by omega : 0 < y))
+  have hzx : (z : ℚ) ≠ 0 := by exact_mod_cast (Nat.ne_of_gt (by omega : 0 < z))
+  have hEqQ :
+      (4 : ℚ) * x * y * z = n * (x * y + x * z + y * z) := by
+    exact_mod_cast hEq
+  field_simp [hnx, hxx, hyx, hzx]
+  ring_nf at hEqQ ⊢
+  exact hEqQ
+
 end ErdosStraus
