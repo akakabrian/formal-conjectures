@@ -206,7 +206,7 @@ theorem tree_degree_le_two_of_leafCount_le_two (H : SimpleGraph α) [DecidableRe
       _ = (∑ w : α, if H.degree w = 1 then (1 : ℤ) else 0) +
           (∑ w : α, if w = v then (-1 : ℤ) else 0) := Finset.sum_add_distrib
       _ = ((Finset.univ.filter (fun w => H.degree w = 1)).card : ℤ) - 1 := by
-            simp
+            simpa [sub_eq_add_neg]
   rw [hright] at hsumle
   have hLeavesZ : ((Finset.univ.filter (fun w => H.degree w = 1)).card : ℤ) ≤ 2 := by
     exact_mod_cast hLeaves
