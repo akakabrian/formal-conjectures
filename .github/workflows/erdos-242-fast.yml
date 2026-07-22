@@ -31,6 +31,7 @@ jobs:
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.ElementaryFamilies \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Scaling \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Reduction \
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.MinimalCounterexample \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.TypeIIFactorPair \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorResidues \
             > erdos-242-build.log 2>&1
