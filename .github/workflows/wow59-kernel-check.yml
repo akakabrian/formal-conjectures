@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - agent/wowii-59-kernel-check
+    paths-ignore:
+      - lean-ci.log
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   verify:
@@ -15,6 +17,8 @@ jobs:
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install elan
         run: |
@@ -30,15 +34,21 @@ jobs:
         run: lake exe cache get
 
       - name: Kernel-check certificate
+        id: verify
         shell: bash
         run: |
+          set +e
           set -o pipefail
           {
             echo '$ lake build FormalConjectures.WrittenOnTheWallII.GraphConjecture59Counterexample'
             lake build FormalConjectures.WrittenOnTheWallII.GraphConjecture59Counterexample
             echo '$ lake env lean -DwarningAsError=true WOW59Check.lean'
             lake env lean -DwarningAsError=true WOW59Check.lean
-          } 2>&1 | tee lean-ci.log
+          } > lean-ci.log 2>&1
+          status=$?
+          printf '\nEXIT_STATUS=%s\n' "$status" >> lean-ci.log
+          echo "exit_status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
 
       - name: Upload compiler log
         if: always()
@@ -46,3 +56,16 @@ jobs:
         with:
           name: wow59-lean-ci-log-${{ github.run_id }}
           path: lean-ci.log
+
+      - name: Publish compiler log
+        if: always() && github.event_name == 'push'
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f lean-ci.log
+          git commit -m "ci: publish WOWII 59 Lean log" || true
+          git push origin HEAD:${GITHUB_REF_NAME}
+
+      - name: Fail job when Lean failed
+        if: steps.verify.outputs.exit_status != '0'
+        run: exit 1
