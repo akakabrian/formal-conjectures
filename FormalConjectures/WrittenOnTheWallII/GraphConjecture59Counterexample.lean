@@ -1,3 +1,19 @@
+/-
+Copyright 2026 The Formal Conjectures Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-/
+
 import FormalConjecturesUtil
 
 /-!
@@ -205,6 +221,7 @@ private lemma counterG_forest_le : counterG.largestInducedForestSize ≤ 13 := b
       exact hacyclic p hp
 
 /-- The exact Conjecture 59 inequality fails on `counterG`. -/
+@[category test, AMS 5]
 theorem counterexample_conjecture59 :
     ¬ (⌈Real.sqrt ((residue counterG : ℝ) * b counterG)⌉ ≤
          (counterG.largestInducedForestSize : ℝ)) := by
@@ -228,6 +245,7 @@ theorem counterexample_conjecture59 :
   linarith
 
 /-- Repository-style classification of the universal statement as false. -/
+@[category research solved, AMS 5]
 theorem conjecture59_false : answer(False) ↔
     ∀ (α : Type) [Fintype α] [DecidableEq α] [Nontrivial α]
       (G : SimpleGraph α) [DecidableRel G.Adj] (_hG : G.Connected),
