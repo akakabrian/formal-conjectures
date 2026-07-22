@@ -38,11 +38,18 @@ $\mathrm{residue}(G)$ is the Havel-Hakimi residue (the number of zeros remaining
 after applying the Havel-Hakimi algorithm to the degree sequence until termination)
 and $b(G)$ is the size of a largest induced bipartite subgraph.
 
+This conjecture is false. A connected graph on 18 vertices has
+`residue G = 10`, `17 ≤ b G`, and `G.largestInducedForestSize ≤ 13`.
+Consequently, the conjectured lower bound is at least `⌈√170⌉ = 14`.
+
 See: Favaron, Mahéo, Saclé (1991) for the residue; DeLaVina's Graffiti.pc for the conjecture.
 -/
-@[category research open, AMS 5]
-theorem conjecture59 (G : SimpleGraph α) [DecidableRel G.Adj] (h : G.Connected) :
-    ⌈Real.sqrt ((residue G : ℝ) * b G)⌉ ≤ (G.largestInducedForestSize : ℝ) := by
+@[category research solved, AMS 5,
+  formal_proof using lean4 at "https://github.com/akakabrian/WOW-59/blob/1dc12403c7e9cce83e88c423ec7fadfc1ae0370e/WOW59/Counterexample.lean"]
+theorem conjecture59 : answer(False) ↔
+    ∀ (α : Type) [Fintype α] [DecidableEq α] [Nontrivial α]
+      (G : SimpleGraph α) [DecidableRel G.Adj] (_hG : G.Connected),
+      ⌈Real.sqrt ((residue G : ℝ) * b G)⌉ ≤ (G.largestInducedForestSize : ℝ) := by
   sorry
 
 -- Sanity checks
