@@ -1,11 +1,18 @@
-name: Verify WOWII 59 counterexample
+name: WOWII 59 Lean
+
+concurrency:
+  group: wowii59-kernel-check
+  cancel-in-progress: true
 
 on:
   push:
     branches:
       - agent/wowii-59-kernel-check
     paths-ignore:
-      - lean-ci.log
+      - 'ci/**'
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -13,6 +20,7 @@ permissions:
 
 jobs:
   verify:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -22,9 +30,9 @@ jobs:
 
       - name: Install elan
         run: |
-          set -o pipefail
-          curl -sSfL https://github.com/leanprover/elan/releases/download/v1.4.2/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
-          ./elan-init -y --default-toolchain none
+          curl --proto '=https' --tlsv1.2 -sSf \
+            https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain none
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
       - name: Resolve dependencies
@@ -33,38 +41,44 @@ jobs:
       - name: Download Mathlib cache
         run: lake exe cache get
 
-      - name: Kernel-check certificate
+      - name: Verify and capture compiler log
         id: verify
         shell: bash
         run: |
+          mkdir -p ci
           set +e
-          set -o pipefail
           {
-            echo '$ lake build FormalConjectures.WrittenOnTheWallII.GraphConjecture59Counterexample'
-            lake build FormalConjectures.WrittenOnTheWallII.GraphConjecture59Counterexample
+            echo '$ lake build +FormalConjectures.WrittenOnTheWallII.GraphConjecture59Counterexample'
+            lake build +FormalConjectures.WrittenOnTheWallII.GraphConjecture59Counterexample
             echo '$ lake env lean -DwarningAsError=true WOW59Check.lean'
             lake env lean -DwarningAsError=true WOW59Check.lean
-          } > lean-ci.log 2>&1
+          } > ci/wowii59-build.log 2>&1
           status=$?
-          printf '\nEXIT_STATUS=%s\n' "$status" >> lean-ci.log
+          set -e
+
+          {
+            echo "commit=${GITHUB_SHA}"
+            echo "build_exit_code=${status}"
+            date -u +"finished_utc=%Y-%m-%dT%H:%M:%SZ"
+          } > ci/wowii59-status.txt
+          sha256sum ci/wowii59-build.log ci/wowii59-status.txt > ci/wowii59.sha256
           echo "exit_status=$status" >> "$GITHUB_OUTPUT"
-          exit 0
 
-      - name: Upload compiler log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: wow59-lean-ci-log-${{ github.run_id }}
-          path: lean-ci.log
-
-      - name: Publish compiler log
+      - name: Publish compiler transcript on isolated branch
         if: always() && github.event_name == 'push'
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add -f lean-ci.log
-          git commit -m "ci: publish WOWII 59 Lean log" || true
+          git add -f ci/wowii59-build.log ci/wowii59-status.txt ci/wowii59.sha256
+          git commit -m "ci: publish WOWII 59 Lean transcript [skip ci]" || true
           git push origin HEAD:${GITHUB_REF_NAME}
+
+      - name: Upload compiler transcript
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wowii59-lean-${{ github.run_id }}
+          path: ci/
 
       - name: Fail job when Lean failed
         if: steps.verify.outputs.exit_status != '0'
