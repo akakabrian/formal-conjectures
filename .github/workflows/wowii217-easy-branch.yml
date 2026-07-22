@@ -1,0 +1,67 @@
+name: WOWII 217 Easy Branch
+
+on:
+  push:
+    branches:
+      - codex/wowii-217-formalization
+    paths-ignore:
+      - 'ci/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Lean
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf \
+            https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Prepare dependencies
+        run: |
+          lake update
+          lake exe cache get
+
+      - name: Kernel-check Conjecture 217 attempt
+        id: verify
+        shell: bash
+        run: |
+          mkdir -p ci/easy-branch
+          set +e
+          lake build +FormalConjectures.WrittenOnTheWallII.GraphConjecture217Attempt \
+            > ci/easy-branch/build.log 2>&1
+          status=$?
+          set -e
+          {
+            echo "commit=${GITHUB_SHA}"
+            echo "build_exit_code=${status}"
+            date -u +"finished_utc=%Y-%m-%dT%H:%M:%SZ"
+          } > ci/easy-branch/status.txt
+          sha256sum ci/easy-branch/build.log ci/easy-branch/status.txt \
+            > ci/easy-branch/SHA256SUMS
+          echo "exit_status=$status" >> "$GITHUB_OUTPUT"
+
+      - name: Publish exact transcript
+        if: always()
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git add -f ci/easy-branch/build.log ci/easy-branch/status.txt ci/easy-branch/SHA256SUMS
+          git commit -m "ci: publish WOWII 217 easy-branch transcript [skip ci]" || true
+          git push origin HEAD:"${GITHUB_REF_NAME}"
+
+      - name: Fail if Lean failed
+        if: steps.verify.outputs.exit_status != '0'
+        run: exit 1
