@@ -47,11 +47,17 @@ theorem mod_three_two_family (k : ℕ) (hk : 1 ≤ k) :
 theorem mod_four_three_family (k : ℕ) :
     HasDistinctDecomposition (4 * k + 3) := by
   let M := (4 * k + 3) * (k + 1)
+  have hM : 1 < M := by
+    dsimp [M]
+    nlinarith
+  have hMpos : 0 < M + 1 := by omega
   refine ⟨k + 1, M + 1, M * (M + 1), by omega, ?_, ?_, ?_⟩
   · dsimp [M]
     nlinarith
-  · dsimp [M]
-    nlinarith
+  · calc
+      M + 1 = (M + 1) * 1 := by simp
+      _ < (M + 1) * M := Nat.mul_lt_mul_of_pos_left hM hMpos
+      _ = M * (M + 1) := by ring
   · dsimp [M]
     ring
 
