@@ -89,7 +89,7 @@ lemma sum_indepNeighbors_le_twice_edges
     (∑ v, G.indepNeighbors v) ≤
       (2 * (maxEdgeTriangleFreeSubgraph G).edgeFinset.card : ℕ) := by
   classical
-  simpa [SimpleGraph.indepNeighbors, ← Nat.cast_sum] using
-    sum_indepNeighborsCard_le_twice_edges G
+  simp only [SimpleGraph.indepNeighbors, ← Nat.cast_sum]
+  exact_mod_cast sum_indepNeighborsCard_le_twice_edges G
 
 end WrittenOnTheWallII.GraphConjecture2.Alternative
