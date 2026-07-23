@@ -16,14 +16,15 @@ limitations under the License.
 
 import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.MinimalCounterexample
 import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.SmallGates
+import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorSquareNormalization
 
 /-!
-# Erdős–Straus Phase 1 axiom audit
+# Erdős–Straus foundation axiom audit
 
 This standalone Lean script emits the axiom dependencies of the principal
-helper theorems used in the strict-denominator Phase 1 foundation. It is run
-with `lake env lean` rather than built as a project module because Lean does
-not permit `#print axioms` inside a `module` file.
+helper theorems used in the strict-denominator foundation and divisor-square
+normalization. It is run with `lake env lean` rather than built as a project
+module because Lean does not permit `#print axioms` inside a `module` file.
 -/
 
 #print axioms ErdosStraus.HasDistinctDecomposition.toRational
@@ -37,3 +38,7 @@ not permit `#print axioms` inside a `module` file.
 #print axioms ErdosStraus.typeII_factor_pair_hasDistinctDecomposition
 #print axioms ErdosStraus.oppositeCoprimeDivisors_hasDistinctDecomposition
 #print axioms ErdosStraus.dThree_gate_hasDistinctDecomposition
+#print axioms ErdosStraus.divisorSquare_hasOppositeCoprimeDivisors
+#print axioms ErdosStraus.divisorSquare_hasDistinctDecomposition
+#print axioms ErdosStraus.coprime_offset_of_prime
+#print axioms ErdosStraus.prime_divisorSquare_hasDistinctDecomposition
