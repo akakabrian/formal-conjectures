@@ -12,6 +12,7 @@ on:
       - "main"
       - "erdos-242-phase1"
       - "erdos-242-typeii-equivalence"
+      - "erdos-242-mordell-reduction"
     paths:
       - "FormalConjecturesForMathlib/NumberTheory/ErdosStraus/**"
       - ".github/workflows/erdos-242-fast.yml"
