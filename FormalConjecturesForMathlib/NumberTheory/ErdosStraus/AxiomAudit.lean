@@ -17,14 +17,16 @@ limitations under the License.
 import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.MinimalCounterexample
 import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.SmallGates
 import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorSquareNormalization
+import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.MordellReduction
 
 /-!
 # Erdős–Straus foundation axiom audit
 
 This standalone Lean script emits the axiom dependencies of the principal
-helper theorems used in the strict-denominator foundation and divisor-square
-normalization. It is run with `lake env lean` rather than built as a project
-module because Lean does not permit `#print axioms` inside a `module` file.
+helper theorems used in the strict-denominator foundation, divisor-square
+normalization, and Mordell residue reduction. It is run with `lake env lean`
+rather than built as a project module because Lean does not permit
+`#print axioms` inside a `module` file.
 -/
 
 #print axioms ErdosStraus.HasDistinctDecomposition.toRational
@@ -42,3 +44,12 @@ module because Lean does not permit `#print axioms` inside a `module` file.
 #print axioms ErdosStraus.divisorSquare_hasDistinctDecomposition
 #print axioms ErdosStraus.coprime_offset_of_prime
 #print axioms ErdosStraus.prime_divisorSquare_hasDistinctDecomposition
+#print axioms ErdosStraus.mod_one_twenty_seventy_three_family
+#print axioms ErdosStraus.mod_one_twenty_ninety_seven_family
+#print axioms ErdosStraus.mod_one_sixty_eight_seventy_three_family
+#print axioms ErdosStraus.mod_one_sixty_eight_ninety_seven_family
+#print axioms ErdosStraus.mod_one_sixty_eight_one_forty_five_family
+#print axioms ErdosStraus.prime_counterexample_mod_one_twenty
+#print axioms ErdosStraus.prime_counterexample_mod_one_sixty_eight
+#print axioms ErdosStraus.prime_counterexample_mod_eight_forty
+#print axioms ErdosStraus.exists_prime_counterexample_mordell
