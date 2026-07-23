@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - ci/wowii-59-submit-check
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
