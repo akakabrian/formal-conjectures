@@ -20,7 +20,7 @@ import FormalConjectures.WrittenOnTheWallII.GraphConjecture2AlternativeLocalBoun
 # Edge replacement for the alternative proof of WOWII Conjecture 2
 
 This file replaces all edges incident to a vertex `v` by a finite star from
-`v` to an independent subset `A` of its neighbourhood.  Edge maximality of the
+`v` to an independent subset `A` of its neighbourhood. Edge maximality of the
 chosen triangle-free spanning subgraph then forces `A.card ≤ H.degree v`.
 -/
 
@@ -75,6 +75,13 @@ lemma card_edgeFinset_centerReplacement
     Finset.card_union_of_disjoint hdisjEdges,
     H.card_edgeFinset_deleteIncidenceSet v,
     card_edgeFinset_finsetStar hv]
+
+lemma ncard_edgeSet_centerReplacement
+    (H : SimpleGraph α) {v : α} {A : Finset α} (hv : v ∉ A) :
+    (centerReplacement H v A).edgeSet.ncard =
+      H.edgeSet.ncard - H.degree v + A.card := by
+  rw [Set.ncard_eq_toFinset_card', Set.ncard_eq_toFinset_card']
+  exact card_edgeFinset_centerReplacement H hv
 
 lemma centerReplacement_cliqueFree
     (G H : SimpleGraph α) (hHG : H ≤ G) (hHtri : H.CliqueFree 3)
@@ -158,7 +165,7 @@ of neighbours of `v` has cardinality at most the degree of `v`. -/
 lemma indepSet_card_le_degree_of_maxEdge_triangleFree
     (G H : SimpleGraph α) (hHG : H ≤ G) (hHtri : H.CliqueFree 3)
     (hmax : ∀ K : SimpleGraph α,
-      K ≤ G → K.CliqueFree 3 → K.edgeFinset.card ≤ H.edgeFinset.card)
+      K ≤ G → K.CliqueFree 3 → K.edgeSet.ncard ≤ H.edgeSet.ncard)
     {v : α} {A : Finset α}
     (hA : ∀ a ∈ A, G.Adj v a)
     (hAind : G.IsIndepSet (A : Set α)) :
@@ -172,13 +179,15 @@ lemma indepSet_card_le_degree_of_maxEdge_triangleFree
   have hKtri : (centerReplacement H v A).CliqueFree 3 :=
     centerReplacement_cliqueFree G H hHG hHtri hv hAind
   have hcard_le := hmax (centerReplacement H v A) hKle hKtri
-  have hcard_eq := card_edgeFinset_centerReplacement H hv
-  have hineq : H.edgeFinset.card - H.degree v + A.card ≤ H.edgeFinset.card := by
+  have hcard_eq := ncard_edgeSet_centerReplacement H hv
+  have hineq : H.edgeSet.ncard - H.degree v + A.card ≤ H.edgeSet.ncard := by
     calc
-      H.edgeFinset.card - H.degree v + A.card =
-          (centerReplacement H v A).edgeFinset.card := hcard_eq.symm
-      _ ≤ H.edgeFinset.card := hcard_le
-  have hdegree : H.degree v ≤ H.edgeFinset.card := H.degree_le_card_edgeFinset v
+      H.edgeSet.ncard - H.degree v + A.card =
+          (centerReplacement H v A).edgeSet.ncard := hcard_eq.symm
+      _ ≤ H.edgeSet.ncard := hcard_le
+  have hdegree : H.degree v ≤ H.edgeSet.ncard := by
+    rw [Set.ncard_eq_toFinset_card']
+    exact H.degree_le_card_edgeFinset v
   omega
 
 lemma indepSet_card_le_degree_maxEdgeTriangleFreeSubgraph
@@ -191,7 +200,7 @@ lemma indepSet_card_le_degree_maxEdgeTriangleFreeSubgraph
   · exact maxEdgeTriangleFreeSubgraph_le G
   · exact maxEdgeTriangleFreeSubgraph_cliqueFree G
   · intro K hKG hKtri
-    exact card_edgeFinset_le_maxEdgeTriangleFreeSubgraph G K hKG hKtri
+    exact ncard_edgeSet_le_maxEdgeTriangleFreeSubgraph G K hKG hKtri
   · exact hA
   · exact hAind
 
