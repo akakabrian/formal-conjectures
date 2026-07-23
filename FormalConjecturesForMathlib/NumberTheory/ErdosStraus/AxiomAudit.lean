@@ -17,14 +17,15 @@ limitations under the License.
 import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.MinimalCounterexample
 import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.SmallGates
 import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorSquareNormalization
+import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.ModElevenReduction
 
 /-!
 # Erdős–Straus foundation axiom audit
 
 This standalone Lean script emits the axiom dependencies of the principal
-helper theorems used in the strict-denominator foundation and divisor-square
-normalization. It is run with `lake env lean` rather than built as a project
-module because Lean does not permit `#print axioms` inside a `module` file.
+strict-denominator reductions through the corrected modulo-9240 sieve. It is
+run with `lake env lean` rather than built as a project module because Lean
+does not permit `#print axioms` inside a `module` file.
 -/
 
 #print axioms ErdosStraus.HasDistinctDecomposition.toRational
@@ -42,3 +43,22 @@ module because Lean does not permit `#print axioms` inside a `module` file.
 #print axioms ErdosStraus.divisorSquare_hasDistinctDecomposition
 #print axioms ErdosStraus.coprime_offset_of_prime
 #print axioms ErdosStraus.prime_divisorSquare_hasDistinctDecomposition
+#print axioms ErdosStraus.mod_one_twenty_seventy_three_family
+#print axioms ErdosStraus.mod_one_twenty_ninety_seven_family
+#print axioms ErdosStraus.mod_one_sixty_eight_seventy_three_family
+#print axioms ErdosStraus.mod_one_sixty_eight_ninety_seven_family
+#print axioms ErdosStraus.mod_one_sixty_eight_one_forty_five_family
+#print axioms ErdosStraus.prime_counterexample_mod_eight_forty
+#print axioms ErdosStraus.mod_one_three_two_zero_two_forty_one_family
+#print axioms ErdosStraus.mod_one_three_two_zero_four_eighty_one_family
+#print axioms ErdosStraus.mod_one_three_two_zero_six_zero_one_family
+#print axioms ErdosStraus.mod_one_three_two_zero_four_zero_nine_family
+#print axioms ErdosStraus.mod_one_three_two_zero_seven_sixty_nine_family
+#print axioms ErdosStraus.mod_one_three_two_zero_one_zero_zero_nine_family
+#print axioms ErdosStraus.mod_one_three_two_zero_one_one_two_nine_family
+#print axioms ErdosStraus.mod_one_three_two_zero_one_two_four_nine_family
+#print axioms ErdosStraus.mod_nine_two_four_zero_one_two_zero_one_family
+#print axioms ErdosStraus.mod_nine_two_four_zero_six_zero_zero_one_family
+#print axioms ErdosStraus.prime_counterexample_mod_one_three_two_zero
+#print axioms ErdosStraus.prime_counterexample_mod_nine_two_four_zero
+#print axioms ErdosStraus.exists_prime_counterexample_mod_nine_two_four_zero
