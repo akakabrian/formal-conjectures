@@ -53,11 +53,15 @@ theorem prime_counterexample_mod_one_twenty
   · right
     omega
   · have hform : p = 120 * ((p / 24) / 5) + 73 := by omega
-    exact (hnot (by simpa [hform] using
-      mod_one_twenty_seventy_three_family ((p / 24) / 5))).elim
+    have hdec : HasDistinctDecomposition p := by
+      rw [hform]
+      exact mod_one_twenty_seventy_three_family ((p / 24) / 5)
+    exact (hnot hdec).elim
   · have hform : p = 120 * ((p / 24) / 5) + 97 := by omega
-    exact (hnot (by simpa [hform] using
-      mod_one_twenty_ninety_seven_family ((p / 24) / 5))).elim
+    have hdec : HasDistinctDecomposition p := by
+      rw [hform]
+      exact mod_one_twenty_ninety_seven_family ((p / 24) / 5)
+    exact (hnot hdec).elim
 
 /-- A prime strict counterexample in `1 mod 24` is `1`, `25`, or `121 mod 168`. -/
 theorem prime_counterexample_mod_one_sixty_eight
@@ -84,17 +88,23 @@ theorem prime_counterexample_mod_one_sixty_eight
     have hp7 : p = 7 := (hp.dvd_iff_eq (by norm_num)).mp h7p
     omega
   · have hform : p = 168 * ((p / 24) / 7) + 73 := by omega
-    exact (hnot (by simpa [hform] using
-      mod_one_sixty_eight_seventy_three_family ((p / 24) / 7))).elim
+    have hdec : HasDistinctDecomposition p := by
+      rw [hform]
+      exact mod_one_sixty_eight_seventy_three_family ((p / 24) / 7)
+    exact (hnot hdec).elim
   · have hform : p = 168 * ((p / 24) / 7) + 97 := by omega
-    exact (hnot (by simpa [hform] using
-      mod_one_sixty_eight_ninety_seven_family ((p / 24) / 7))).elim
+    have hdec : HasDistinctDecomposition p := by
+      rw [hform]
+      exact mod_one_sixty_eight_ninety_seven_family ((p / 24) / 7)
+    exact (hnot hdec).elim
   · right
     right
     omega
   · have hform : p = 168 * ((p / 24) / 7) + 145 := by omega
-    exact (hnot (by simpa [hform] using
-      mod_one_sixty_eight_one_forty_five_family ((p / 24) / 7))).elim
+    have hdec : HasDistinctDecomposition p := by
+      rw [hform]
+      exact mod_one_sixty_eight_one_forty_five_family ((p / 24) / 7)
+    exact (hnot hdec).elim
 
 /-- The six classical Mordell residual classes modulo `840`. -/
 def IsMordellResidue (r : ℕ) : Prop :=
