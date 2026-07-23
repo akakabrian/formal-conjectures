@@ -46,7 +46,7 @@ lemma tree_pair_degree_le_leafCount_add_two
   haveI : Nontrivial α := ⟨⟨u, v, huv.ne⟩⟩
   have huniv : (Finset.univ : Finset α) = L ∪ I := by
     ext x
-    simp [L, I]
+    by_cases hx : T.degree x = 1 <;> simp [L, I, hx]
   have hdisj : Disjoint L I := by
     refine Finset.disjoint_left.mpr ?_
     intro x hxL hxI
@@ -90,17 +90,20 @@ lemma tree_pair_degree_le_leafCount_add_two
     dsimp [f]
     exact sub_nonneg.mpr (by exact_mod_cast htwo)
   have hleaf : (L.card : ℤ) = 2 + ∑ x ∈ I, f x := by
-    rw [hsumdiff, hsumL] at hsplit
-    omega
+    have hEq : (-2 : ℤ) = -(L.card : ℤ) + ∑ x ∈ I, f x := by
+      calc
+        (-2 : ℤ) = ∑ x, f x := hsumdiff.symm
+        _ = (∑ x ∈ L, f x) + ∑ x ∈ I, f x := hsplit
+        _ = -(L.card : ℤ) + ∑ x ∈ I, f x := by rw [hsumL]
+    linarith
   have hLnonneg : 0 ≤ (L.card : ℤ) := by positivity
   by_cases huI : u ∈ I
   · by_cases hvI : v ∈ I
     · have hpair : f u + f v ≤ ∑ x ∈ I, f x := by
         exact I.add_le_sum hnonneg huI hvI huv.ne
       change (T.degree u : ℤ) + T.degree v ≤ (L.card : ℤ) + 2
-      rw [hleaf]
       dsimp [f] at hpair
-      omega
+      linarith [hleaf, hpair]
     · have hv1 : T.degree v = 1 := by
         by_contra hvne
         apply hvI
@@ -108,9 +111,9 @@ lemma tree_pair_degree_le_leafCount_add_two
         exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, hvne⟩
       have huBound : f u ≤ ∑ x ∈ I, f x := I.single_le_sum hnonneg huI
       change (T.degree u : ℤ) + T.degree v ≤ (L.card : ℤ) + 2
-      rw [hleaf, hv1]
       dsimp [f] at huBound
-      omega
+      rw [hv1]
+      linarith [hleaf, huBound]
   · have hu1 : T.degree u = 1 := by
       by_contra hune
       apply huI
@@ -119,9 +122,9 @@ lemma tree_pair_degree_le_leafCount_add_two
     by_cases hvI : v ∈ I
     · have hvBound : f v ≤ ∑ x ∈ I, f x := I.single_le_sum hnonneg hvI
       change (T.degree u : ℤ) + T.degree v ≤ (L.card : ℤ) + 2
-      rw [hleaf, hu1]
       dsimp [f] at hvBound
-      omega
+      rw [hu1]
+      linarith [hleaf, hvBound]
     · have hv1 : T.degree v = 1 := by
         by_contra hvne
         apply hvI
