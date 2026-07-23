@@ -72,28 +72,31 @@ lemma finsetStar_adj {v x y : α} {A : Finset α} (hv : v ∉ A) :
         subst x
         exact hv hx
 
-lemma finsetStar_le_starGraph (v : α) (A : Finset α) :
-    finsetStar v A ≤ SimpleGraph.starGraph v := by
-  intro x y hxy
-  rw [SimpleGraph.starGraph_adj]
-  rw [finsetStar, SimpleGraph.fromEdgeSet_adj] at hxy
-  rcases hxy with ⟨hmem, hne⟩
-  change s(x, y) ∈ A.image (fun a => s(v, a)) at hmem
-  rcases Finset.mem_image.mp hmem with ⟨a, _, hae⟩
-  rcases Sym2.eq_iff.mp hae with h | h
-  · exact ⟨hne, Or.inl h.1.symm⟩
-  · exact ⟨hne, Or.inr h.1.symm⟩
-
-lemma finsetStar_isAcyclic (v : α) (A : Finset α) :
-    (finsetStar v A).IsAcyclic :=
-  (SimpleGraph.isAcyclic_starGraph v).anti (finsetStar_le_starGraph v A)
-
-lemma finsetStar_cliqueFree (v : α) (A : Finset α) :
+lemma finsetStar_cliqueFree {v : α} {A : Finset α} (hv : v ∉ A) :
     (finsetStar v A).CliqueFree 3 := by
   intro s hs
-  obtain ⟨u, w, hw, _⟩ :=
-    (SimpleGraph.is3Clique_iff_exists_cycle_length_three.mp ⟨s, hs⟩)
-  exact finsetStar_isAcyclic v A w hw
+  rw [SimpleGraph.is3Clique_iff] at hs
+  obtain ⟨x, y, z, hxy, hxz, hyz, rfl⟩ := hs
+  rw [finsetStar_adj hv] at hxy hxz hyz
+  rcases hxy with hxy | hxy
+  · rcases hxy with ⟨hx, hy⟩
+    subst x
+    have hz : z ∈ A := by
+      rcases hxz with hxz | hxz
+      · exact hxz.2
+      · exact False.elim (hv hxz.2)
+    rcases hyz with hyz | hyz
+    · exact hv (hyz.1 ▸ hy)
+    · exact hv (hyz.1 ▸ hz)
+  · rcases hxy with ⟨hy, hx⟩
+    subst y
+    have hz : z ∈ A := by
+      rcases hyz with hyz | hyz
+      · exact hyz.2
+      · exact False.elim (hv hyz.2)
+    rcases hxz with hxz | hxz
+    · exact hv (hxz.1 ▸ hx)
+    · exact hv (hxz.1 ▸ hz)
 
 lemma finsetStar_le (G : SimpleGraph α) {v : α} {A : Finset α}
     (hA : ∀ a ∈ A, G.Adj v a) :
