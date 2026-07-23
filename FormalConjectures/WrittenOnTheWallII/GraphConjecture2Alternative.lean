@@ -42,6 +42,9 @@ namespace WrittenOnTheWallII.GraphConjecture2.Alternative
 
 open Classical Finset SimpleGraph
 
+set_option linter.style.ams_attribute false
+set_option linter.style.category_attribute false
+
 variable {α : Type*} [Fintype α] [DecidableEq α]
 
 /-- A finite graph has a triangle-free subgraph with maximum edge count among
@@ -116,33 +119,51 @@ lemma cliqueFree_sup_edge_of_not_reachable
         (H ⊔ SimpleGraph.edge a b).Adj y z →
         H.Reachable a b := by
     intro x y z hxy hxz hyz
-    rcases (SimpleGraph.edge_adj a b x y).mp hxy with ⟨hxy, hab⟩
-    rcases hxy with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
-    · have haz : H.Adj a z := by
+    rcases (SimpleGraph.edge_adj a b x y).mp hxy with ⟨hxy_cases, hxy_ne⟩
+    rcases hxy_cases with hxy_case | hxy_case
+    · rcases hxy_case with ⟨hx, hy⟩
+      subst x
+      subst y
+      have haz : H.Adj a z := by
         rcases hxz with hxz | hxz
         · exact hxz
-        · have hz : z = b := by simpa [SimpleGraph.edge_adj, hab] using hxz
-          subst z
-          exact False.elim ((H ⊔ SimpleGraph.edge a b).loopless b hyz)
+        · rcases (SimpleGraph.edge_adj a b a z).mp hxz with ⟨hxz_cases, _⟩
+          rcases hxz_cases with hxz_case | hxz_case
+          · rcases hxz_case with ⟨_, hz⟩
+            subst z
+            exact False.elim ((H ⊔ SimpleGraph.edge a b).loopless b hyz)
+          · exact False.elim (hxy_ne hxz_case.1)
       have hbz : H.Adj b z := by
         rcases hyz with hyz | hyz
         · exact hyz
-        · have hz : z = a := by simpa [SimpleGraph.edge_adj, hab] using hyz
-          subst z
-          exact False.elim ((H ⊔ SimpleGraph.edge a b).loopless a hxz)
+        · rcases (SimpleGraph.edge_adj a b b z).mp hyz with ⟨hyz_cases, _⟩
+          rcases hyz_cases with hyz_case | hyz_case
+          · exact False.elim (hxy_ne hyz_case.1.symm)
+          · rcases hyz_case with ⟨_, hz⟩
+            subst z
+            exact False.elim ((H ⊔ SimpleGraph.edge a b).loopless a hxz)
       exact haz.reachable.trans hbz.symm.reachable
-    · have hbz : H.Adj b z := by
+    · rcases hxy_case with ⟨hx, hy⟩
+      subst x
+      subst y
+      have hbz : H.Adj b z := by
         rcases hxz with hxz | hxz
         · exact hxz
-        · have hz : z = a := by simpa [SimpleGraph.edge_adj, hab.symm] using hxz
-          subst z
-          exact False.elim ((H ⊔ SimpleGraph.edge a b).loopless a hyz)
+        · rcases (SimpleGraph.edge_adj a b b z).mp hxz with ⟨hxz_cases, _⟩
+          rcases hxz_cases with hxz_case | hxz_case
+          · exact False.elim (hxy_ne hxz_case.1)
+          · rcases hxz_case with ⟨_, hz⟩
+            subst z
+            exact False.elim ((H ⊔ SimpleGraph.edge a b).loopless a hyz)
       have haz : H.Adj a z := by
         rcases hyz with hyz | hyz
         · exact hyz
-        · have hz : z = b := by simpa [SimpleGraph.edge_adj, hab.symm] using hyz
-          subst z
-          exact False.elim ((H ⊔ SimpleGraph.edge a b).loopless b hxz)
+        · rcases (SimpleGraph.edge_adj a b a z).mp hyz with ⟨hyz_cases, _⟩
+          rcases hyz_cases with hyz_case | hyz_case
+          · rcases hyz_case with ⟨_, hz⟩
+            subst z
+            exact False.elim ((H ⊔ SimpleGraph.edge a b).loopless b hxz)
+          · exact False.elim (hxy_ne hyz_case.1.symm)
       exact haz.reachable.trans hbz.symm.reachable
   intro s hs
   rw [SimpleGraph.is3Clique_iff] at hs
@@ -153,7 +174,11 @@ lemma cliqueFree_sup_edge_of_not_reachable
     · rcases hyz with hyz | hyz
       · exact hHtri {x, y, z} (SimpleGraph.is3Clique_triple_iff.mpr ⟨hxy, hxz, hyz⟩)
       · exact hunreach (hnew hyz (Or.inl hxy.symm) (Or.inl hxz.symm))
-    · exact hunreach (hnew hxz (Or.inl hxy) hyz.symm)
+    · have hzy : (H ⊔ SimpleGraph.edge a b).Adj z y := by
+        rcases hyz with hyz | hyz
+        · exact Or.inl hyz.symm
+        · exact Or.inr hyz.symm
+      exact hunreach (hnew hxz (Or.inl hxy) hzy)
   · exact hunreach (hnew hxy hxz hyz)
 
 /-- Every maximum-edge triangle-free spanning subgraph of a connected graph is
@@ -173,12 +198,13 @@ lemma connected_of_maxEdge_triangleFree
   let K : SimpleGraph α := H ⊔ SimpleGraph.edge a b
   have hKG : K ≤ G := by
     refine sup_le hHG ?_
-    exact (SimpleGraph.edge_le_iff).2 (Or.inr hab)
+    exact (SimpleGraph.edge_le_iff G).2 (Or.inr hab)
   have hKtri : K.CliqueFree 3 :=
     cliqueFree_sup_edge_of_not_reachable H hHtri hunreach
   have hcard_le := hmax K hKG hKtri
   have hcard_eq : K.edgeFinset.card = H.edgeFinset.card + 1 := by
     exact H.card_edgeFinset_sup_edge hnH hne
+  rw [hcard_eq] at hcard_le
   omega
 
 lemma maxEdgeTriangleFreeSubgraph_connected
