@@ -49,7 +49,6 @@ jobs:
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.TypeIIFactorPair \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorResidues \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.SmallGates \
-            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.AxiomAudit \
             > erdos-242-build.log 2>&1
 
       - name: Emit axiom dependencies
