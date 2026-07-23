@@ -146,7 +146,7 @@ def IsModNineTwoFourZeroResidue (r : ℕ) : Prop :=
     r = 5329 ∨ r = 5569 ∨ r = 6169 ∨ r = 6241 ∨ r = 6889 ∨ r = 7561 ∨
     r = 7681 ∨ r = 7921 ∨ r = 8089 ∨ r = 8761
 
-/-- A prime strict counterexample lies in one of 34 classes modulo `9240`. -/
+/- A prime strict counterexample lies in one of 34 classes modulo `9240`. -/
 set_option maxHeartbeats 1000000 in
 theorem prime_counterexample_mod_nine_two_four_zero
     (p : ℕ) (hp : p.Prime) (hp24 : p % 24 = 1)
