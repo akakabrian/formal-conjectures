@@ -127,9 +127,11 @@ theorem mod_one_sixty_eight_one_forty_five_family (t : ℕ) :
   rcases hcases with h0 | h1
   · have hteq : t = 2 * (t / 2) := by omega
     rw [hteq]
-    convert mod_three_thirty_six_one_forty_five_family (t / 2) using 1 <;> ring
+    convert mod_three_thirty_six_one_forty_five_family (t / 2) using 1
+    all_goals ring
   · have hteq : t = 2 * (t / 2) + 1 := by omega
     rw [hteq]
-    convert mod_three_thirty_six_three_thirteen_family (t / 2) using 1 <;> ring
+    convert mod_three_thirty_six_three_thirteen_family (t / 2) using 1
+    all_goals ring
 
 end ErdosStraus
