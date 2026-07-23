@@ -24,7 +24,7 @@ jobs:
           mk_all-check: false
 
       - name: Audit forbidden proof shortcuts
-        id: forbidden-audit
+        id: forbidden_audit
         continue-on-error: true
         run: |
           matches="$(rg -n --glob '*.lean' \
@@ -37,7 +37,7 @@ jobs:
           echo "No forbidden proof shortcuts found." | tee erdos-242-forbidden.log
 
       - name: Build Erdős 242 modules with warnings as errors
-        id: targeted-build
+        id: targeted_build
         continue-on-error: true
         run: |
           lake --wfail build \
@@ -53,7 +53,7 @@ jobs:
             > erdos-242-build.log 2>&1
 
       - name: Emit axiom dependencies
-        id: axiom-audit
+        id: axiom_audit
         continue-on-error: true
         run: |
           lake env lean \
@@ -75,7 +75,7 @@ jobs:
 
       - name: Fail after diagnostics
         if: >-
-          steps.forbidden-audit.outcome == 'failure' ||
-          steps.targeted-build.outcome == 'failure' ||
-          steps.axiom-audit.outcome == 'failure'
+          steps.forbidden_audit.outcome == 'failure' ||
+          steps.targeted_build.outcome == 'failure' ||
+          steps.axiom_audit.outcome == 'failure'
         run: exit 1
