@@ -2,9 +2,12 @@ name: Erdős 242 targeted Lean check
 
 on:
   push:
-    branches: ["erdos-242-phase1", "erdos-242-typeii-equivalence"]
+    branches:
+      - "erdos-242-phase1"
+      - "erdos-242-typeii-equivalence"
+      - "erdos-242-mordell-reduction"
   pull_request:
-    branches: ["main", "erdos-242-phase1"]
+    branches: ["main", "erdos-242-phase1", "erdos-242-typeii-equivalence"]
     paths:
       - "FormalConjecturesForMathlib/NumberTheory/ErdosStraus/**"
       - ".github/workflows/erdos-242-fast.yml"
@@ -50,6 +53,7 @@ jobs:
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorResidues \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorSquareNormalization \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.SmallGates \
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.MordellFamilies \
             > erdos-242-build.log 2>&1
 
       - name: Emit axiom dependencies
