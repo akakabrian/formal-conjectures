@@ -7,11 +7,13 @@ on:
       - "erdos-242-typeii-equivalence"
       - "erdos-242-mordell-reduction"
       - "erdos-242-small-gate-residues"
+      - "erdos-242-mod-eleven-reduction"
   pull_request:
     branches:
       - "main"
       - "erdos-242-phase1"
       - "erdos-242-typeii-equivalence"
+      - "erdos-242-mordell-reduction"
     paths:
       - "FormalConjecturesForMathlib/NumberTheory/ErdosStraus/**"
       - ".github/workflows/erdos-242-fast.yml"
@@ -63,6 +65,8 @@ jobs:
             SmallGateResidues
             MordellFamilies
             MordellReduction
+            ModElevenFamilies
+            ModElevenReduction
           )
           for module in "${optional_modules[@]}"; do
             if [[ -f "FormalConjecturesForMathlib/NumberTheory/ErdosStraus/${module}.lean" ]]; then
