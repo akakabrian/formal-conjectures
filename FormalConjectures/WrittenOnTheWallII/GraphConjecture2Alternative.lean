@@ -204,8 +204,11 @@ lemma connected_of_maxEdge_triangleFree
   have hcard_le := hmax K hKG hKtri
   have hcard_eq : K.edgeFinset.card = H.edgeFinset.card + 1 := by
     exact H.card_edgeFinset_sup_edge hnH hne
-  rw [hcard_eq] at hcard_le
-  omega
+  have hbad : H.edgeFinset.card + 1 ≤ H.edgeFinset.card := by
+    calc
+      H.edgeFinset.card + 1 = K.edgeFinset.card := hcard_eq.symm
+      _ ≤ H.edgeFinset.card := hcard_le
+  exact (Nat.not_succ_le_self H.edgeFinset.card) hbad
 
 lemma maxEdgeTriangleFreeSubgraph_connected
     (G : SimpleGraph α) (hG : G.Connected) :
