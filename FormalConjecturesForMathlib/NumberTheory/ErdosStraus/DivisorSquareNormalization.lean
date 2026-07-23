@@ -107,4 +107,48 @@ theorem divisorSquare_hasDistinctDecomposition
   oppositeCoprimeDivisors_hasDistinctDecomposition p d x hp hx hdp hpd
     (divisorSquare_hasOppositeCoprimeDivisors x d q hx hq hqx hqsq hdqx hdx)
 
+/--
+For a prime target, the offset `d = 4*x-p` is automatically coprime to `x`
+whenever `0 < x < p`.
+-/
+theorem coprime_offset_of_prime
+    (p d x : ℕ) (hp : p.Prime) (hx : 0 < x) (hxp : x < p)
+    (hpd : p + d = 4 * x) :
+    Nat.Coprime d x := by
+  rw [Nat.coprime_iff_gcd_eq_one]
+  let g := Nat.gcd d x
+  change g = 1
+  have hgd : g ∣ d := by
+    dsimp [g]
+    exact Nat.gcd_dvd_left d x
+  have hgx : g ∣ x := by
+    dsimp [g]
+    exact Nat.gcd_dvd_right d x
+  obtain ⟨u, hxu⟩ := hgx
+  have hg4x : g ∣ 4 * x := by
+    refine ⟨4 * u, ?_⟩
+    rw [hxu]
+    ring
+  have hgpd : g ∣ p + d := by simpa [hpd] using hg4x
+  have hgp : g ∣ p := (Nat.dvd_add_iff_right hgd).2 hgpd
+  rcases hp.eq_one_or_self_of_dvd g hgp with hg1 | hgp
+  · exact hg1
+  · subst g
+    have hple : p ≤ x := Nat.le_of_dvd hx ⟨u, hxu⟩
+    omega
+
+/--
+Bradford's strict Type-II divisor-square certificate, specialized to a prime,
+produces the exact distinct-denominator Erdős–Straus conclusion.
+-/
+theorem prime_divisorSquare_hasDistinctDecomposition
+    (p d x q : ℕ)
+    (hp : p.Prime) (hx : 0 < x) (hxp : x < p)
+    (hq : 0 < q) (hqx : q < x)
+    (hdp : d < p) (hpd : p + d = 4 * x)
+    (hqsq : q ∣ x ^ 2) (hdqx : d ∣ q + x) :
+    HasDistinctDecomposition p :=
+  divisorSquare_hasDistinctDecomposition p d x q hp.pos hx hq hqx hdp hpd hqsq hdqx
+    (coprime_offset_of_prime p d x hp hx hxp hpd)
+
 end ErdosStraus
