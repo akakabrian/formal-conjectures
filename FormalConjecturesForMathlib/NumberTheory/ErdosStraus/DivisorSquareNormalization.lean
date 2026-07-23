@@ -124,17 +124,14 @@ theorem coprime_offset_of_prime
   have hgx : g ∣ x := by
     dsimp [g]
     exact Nat.gcd_dvd_right d x
-  obtain ⟨u, hxu⟩ := hgx
-  have hg4x : g ∣ 4 * x := by
-    refine ⟨4 * u, ?_⟩
-    rw [hxu]
-    ring
+  have hg4x : g ∣ 4 * x := dvd_mul_of_dvd_right hgx 4
   have hgpd : g ∣ p + d := by simpa [hpd] using hg4x
-  have hgp : g ∣ p := (Nat.dvd_add_iff_right hgd).2 hgpd
-  rcases hp.eq_one_or_self_of_dvd g hgp with hg1 | hgp
+  have hgdp : g ∣ d + p := by simpa [Nat.add_comm] using hgpd
+  have hgp : g ∣ p := (Nat.dvd_add_iff_right hgd).2 hgdp
+  rcases hp.eq_one_or_self_of_dvd g hgp with hg1 | hgeq
   · exact hg1
-  · subst g
-    have hple : p ≤ x := Nat.le_of_dvd hx ⟨u, hxu⟩
+  · have hpx : p ∣ x := by simpa [hgeq] using hgx
+    have hple : p ≤ x := Nat.le_of_dvd hx hpx
     omega
 
 /--
