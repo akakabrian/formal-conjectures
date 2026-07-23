@@ -166,7 +166,7 @@ theorem mod_nine_two_four_zero_one_two_zero_one_family (t : ℕ) :
   · norm_num
   · nlinarith
   · ring
-  · norm_num
+  · ring
 
 /-- The `6001 mod 9240` strict family from the corrected polynomial identity. -/
 theorem mod_nine_two_four_zero_six_zero_zero_one_family (t : ℕ) :
