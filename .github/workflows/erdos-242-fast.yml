@@ -1,0 +1,108 @@
+name: Erdős 242 targeted Lean check
+
+on:
+  push:
+    branches:
+      - "erdos-242-phase1"
+      - "erdos-242-typeii-equivalence"
+      - "erdos-242-mordell-reduction"
+      - "erdos-242-small-gate-residues"
+      - "erdos-242-mod-eleven-reduction"
+      - "erdos-242-final-reduction"
+  pull_request:
+    branches:
+      - "main"
+      - "erdos-242-phase1"
+      - "erdos-242-typeii-equivalence"
+      - "erdos-242-mordell-reduction"
+      - "erdos-242-mod-eleven-reduction"
+    paths:
+      - "FormalConjecturesForMathlib/NumberTheory/ErdosStraus/**"
+      - ".github/workflows/erdos-242-fast.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leanprover/lean-action@v1
+        with:
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          mk_all-check: false
+
+      - name: Audit forbidden proof shortcuts
+        id: forbidden_audit
+        continue-on-error: true
+        run: |
+          matches="$(rg -n --glob '*.lean' \
+            '\b(sorry|admit|native_decide)\b|^[[:space:]]*(unsafe[[:space:]]+)?axiom[[:space:]]' \
+            FormalConjecturesForMathlib/NumberTheory/ErdosStraus || true)"
+          if [ -n "$matches" ]; then
+            printf '%s\n' "$matches" | tee erdos-242-forbidden.log
+            exit 1
+          fi
+          echo "No forbidden proof shortcuts found." | tee erdos-242-forbidden.log
+
+      - name: Build Erdős 242 modules with warnings as errors
+        id: targeted_build
+        continue-on-error: true
+        run: |
+          targets=(
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Basic
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.ElementaryFamilies
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Scaling
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Reduction
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.MinimalCounterexample
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.TypeIIFactorPair
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorResidues
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorSquareNormalization
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.SmallGates
+          )
+
+          optional_modules=(
+            SmallGateResidues
+            MordellFamilies
+            MordellReduction
+            ModElevenFamilies
+            ModElevenReduction
+            FinalReduction
+          )
+          for module in "${optional_modules[@]}"; do
+            if [[ -f "FormalConjecturesForMathlib/NumberTheory/ErdosStraus/${module}.lean" ]]; then
+              targets+=("FormalConjecturesForMathlib.NumberTheory.ErdosStraus.${module}")
+            fi
+          done
+
+          lake --wfail build "${targets[@]}" > erdos-242-build.log 2>&1
+
+      - name: Emit axiom dependencies
+        id: axiom_audit
+        continue-on-error: true
+        run: |
+          lake env lean \
+            FormalConjecturesForMathlib/NumberTheory/ErdosStraus/AxiomAudit.lean \
+            > erdos-242-axioms.log 2>&1
+          if rg -n 'sorryAx' erdos-242-axioms.log; then
+            exit 1
+          fi
+
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: erdos-242-audit-logs
+          path: |
+            erdos-242-build.log
+            erdos-242-axioms.log
+            erdos-242-forbidden.log
+
+      - name: Fail after diagnostics
+        if: >-
+          steps.forbidden_audit.outcome == 'failure' ||
+          steps.targeted_build.outcome == 'failure' ||
+          steps.axiom_audit.outcome == 'failure'
+        run: exit 1
