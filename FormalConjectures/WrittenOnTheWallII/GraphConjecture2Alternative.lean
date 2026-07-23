@@ -56,7 +56,7 @@ lemma exists_maxEdge_triangleFree_subgraph (G : SimpleGraph α) :
       H ≤ G ∧
       H.CliqueFree 3 ∧
       ∀ K : SimpleGraph α,
-        K ≤ G → K.CliqueFree 3 → K.edgeFinset.card ≤ H.edgeFinset.card := by
+        K ≤ G → K.CliqueFree 3 → K.edgeSet.ncard ≤ H.edgeSet.ncard := by
   classical
   let candidates : Finset (SimpleGraph α) :=
     Finset.univ.filter fun H => H ≤ G ∧ H.CliqueFree 3
@@ -64,7 +64,7 @@ lemma exists_maxEdge_triangleFree_subgraph (G : SimpleGraph α) :
     refine Finset.mem_filter.mpr ⟨Finset.mem_univ _, bot_le, ?_⟩
     exact SimpleGraph.cliqueFree_bot (by decide : 2 ≤ 3)
   obtain ⟨H, hH, hmax⟩ :=
-    Finset.exists_max_image candidates (fun K : SimpleGraph α => K.edgeFinset.card)
+    Finset.exists_max_image candidates (fun K : SimpleGraph α => K.edgeSet.ncard)
       ⟨⊥, hbot⟩
   have hHprop : H ≤ G ∧ H.CliqueFree 3 := (Finset.mem_filter.mp hH).2
   refine ⟨H, hHprop.1, hHprop.2, ?_⟩
@@ -84,9 +84,9 @@ lemma maxEdgeTriangleFreeSubgraph_cliqueFree (G : SimpleGraph α) :
     (maxEdgeTriangleFreeSubgraph G).CliqueFree 3 :=
   (Classical.choose_spec (exists_maxEdge_triangleFree_subgraph G)).2.1
 
-lemma card_edgeFinset_le_maxEdgeTriangleFreeSubgraph
+lemma ncard_edgeSet_le_maxEdgeTriangleFreeSubgraph
     (G K : SimpleGraph α) (hKG : K ≤ G) (hKtri : K.CliqueFree 3) :
-    K.edgeFinset.card ≤ (maxEdgeTriangleFreeSubgraph G).edgeFinset.card :=
+    K.edgeSet.ncard ≤ (maxEdgeTriangleFreeSubgraph G).edgeSet.ncard :=
   (Classical.choose_spec (exists_maxEdge_triangleFree_subgraph G)).2.2 K hKG hKtri
 
 /-- If a connected graph `G` has a disconnected spanning subgraph `H`, some
@@ -188,7 +188,7 @@ lemma connected_of_maxEdge_triangleFree
     (G H : SimpleGraph α) (hG : G.Connected) (hHG : H ≤ G)
     (hHtri : H.CliqueFree 3)
     (hmax : ∀ K : SimpleGraph α,
-      K ≤ G → K.CliqueFree 3 → K.edgeFinset.card ≤ H.edgeFinset.card) :
+      K ≤ G → K.CliqueFree 3 → K.edgeSet.ncard ≤ H.edgeSet.ncard) :
     H.Connected := by
   classical
   by_contra hHconn
@@ -202,10 +202,9 @@ lemma connected_of_maxEdge_triangleFree
   have hKtri : (H ⊔ SimpleGraph.edge a b).CliqueFree 3 :=
     cliqueFree_sup_edge_of_not_reachable H hHtri hunreach
   have hcard_le := hmax (H ⊔ SimpleGraph.edge a b) hKG hKtri
-  have hcard_lt :
-      H.edgeFinset.card < (H ⊔ SimpleGraph.edge a b).edgeFinset.card :=
-    Finset.card_lt_card
-      (SimpleGraph.edgeFinset_strict_mono (H.lt_sup_edge a b hne hnH))
+  have hcard_lt : H.edgeSet.ncard < (H ⊔ SimpleGraph.edge a b).edgeSet.ncard :=
+    Set.ncard_lt_ncard
+      (SimpleGraph.edgeSet_strict_mono (H.lt_sup_edge a b hne hnH))
   exact (Nat.not_lt_of_ge hcard_le) hcard_lt
 
 lemma maxEdgeTriangleFreeSubgraph_connected
@@ -215,6 +214,6 @@ lemma maxEdgeTriangleFreeSubgraph_connected
   · exact maxEdgeTriangleFreeSubgraph_le G
   · exact maxEdgeTriangleFreeSubgraph_cliqueFree G
   · intro K hKG hKtri
-    exact card_edgeFinset_le_maxEdgeTriangleFreeSubgraph G K hKG hKtri
+    exact ncard_edgeSet_le_maxEdgeTriangleFreeSubgraph G K hKG hKtri
 
 end WrittenOnTheWallII.GraphConjecture2.Alternative
