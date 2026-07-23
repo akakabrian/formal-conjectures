@@ -139,4 +139,9 @@ lemma card_edgeFinset_finsetStar {v : α} {A : Finset α} (hv : v ∉ A) :
   · exact h.2
   · exact False.elim (hv (h.2 ▸ ha))
 
+lemma ncard_edgeSet_finsetStar {v : α} {A : Finset α} (hv : v ∉ A) :
+    (finsetStar v A).edgeSet.ncard = A.card := by
+  rw [Set.ncard_eq_toFinset_card']
+  exact card_edgeFinset_finsetStar hv
+
 end WrittenOnTheWallII.GraphConjecture2.Alternative
