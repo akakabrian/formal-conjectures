@@ -54,6 +54,7 @@ jobs:
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorSquareNormalization \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.SmallGates \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.MordellFamilies \
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.MordellReduction \
             > erdos-242-build.log 2>&1
 
       - name: Emit axiom dependencies
