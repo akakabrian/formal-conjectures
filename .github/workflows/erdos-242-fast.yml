@@ -2,7 +2,7 @@ name: Erdős 242 targeted Lean check
 
 on:
   push:
-    branches: ["erdos-242-phase1"]
+    branches: ["erdos-242-phase1", "erdos-242-typeii-equivalence"]
   pull_request:
     branches: ["main"]
     paths:
@@ -48,6 +48,7 @@ jobs:
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.MinimalCounterexample \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.TypeIIFactorPair \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorResidues \
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorSquareNormalization \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.SmallGates \
             > erdos-242-build.log 2>&1
 
