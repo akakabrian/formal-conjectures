@@ -13,16 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -/
-module
 
-public import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.MinimalCounterexample
-public import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.SmallGates
+import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.MinimalCounterexample
+import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.SmallGates
 
 /-!
 # Erdős–Straus Phase 1 axiom audit
 
-This module emits the axiom dependencies of the principal helper theorems used
-in the strict-denominator Phase 1 foundation.
+This standalone Lean script emits the axiom dependencies of the principal
+helper theorems used in the strict-denominator Phase 1 foundation. It is run
+with `lake env lean` rather than built as a project module because Lean does
+not permit `#print axioms` inside a `module` file.
 -/
 
 #print axioms ErdosStraus.HasDistinctDecomposition.toRational
