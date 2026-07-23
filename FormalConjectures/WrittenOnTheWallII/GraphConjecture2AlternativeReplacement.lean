@@ -61,27 +61,27 @@ lemma deleteIncidenceSet_disjoint_finsetStar
     subst y
     exact hOld'.2.2 rfl
 
-lemma card_edgeFinset_centerReplacement
-    (H : SimpleGraph α) {v : α} {A : Finset α} (hv : v ∉ A) :
-    (centerReplacement H v A).edgeFinset.card =
-      H.edgeFinset.card - H.degree v + A.card := by
-  classical
-  have hdisjGraph : Disjoint (H.deleteIncidenceSet v) (finsetStar v A) :=
-    deleteIncidenceSet_disjoint_finsetStar H hv
-  have hdisjEdges :
-      Disjoint (H.deleteIncidenceSet v).edgeFinset (finsetStar v A).edgeFinset :=
-    SimpleGraph.disjoint_edgeFinset.mpr hdisjGraph
-  rw [centerReplacement, SimpleGraph.edgeFinset_sup,
-    Finset.card_union_of_disjoint hdisjEdges,
-    H.card_edgeFinset_deleteIncidenceSet v,
-    card_edgeFinset_finsetStar hv]
+lemma ncard_incidenceSet_eq_degree (H : SimpleGraph α) (v : α) :
+    (H.incidenceSet v).ncard = H.degree v := by
+  rw [Set.ncard_eq_toFinset_card']
+  exact H.card_incidenceFinset_eq_degree v
 
 lemma ncard_edgeSet_centerReplacement
     (H : SimpleGraph α) {v : α} {A : Finset α} (hv : v ∉ A) :
     (centerReplacement H v A).edgeSet.ncard =
       H.edgeSet.ncard - H.degree v + A.card := by
-  rw [Set.ncard_eq_toFinset_card', Set.ncard_eq_toFinset_card']
-  exact card_edgeFinset_centerReplacement H hv
+  classical
+  have hdisjGraph : Disjoint (H.deleteIncidenceSet v) (finsetStar v A) :=
+    deleteIncidenceSet_disjoint_finsetStar H hv
+  have hdisjSets :
+      Disjoint (H.deleteIncidenceSet v).edgeSet (finsetStar v A).edgeSet :=
+    SimpleGraph.disjoint_edgeSet.mpr hdisjGraph
+  rw [centerReplacement, SimpleGraph.edgeSet_sup,
+    Set.ncard_union_eq hdisjSets,
+    SimpleGraph.edgeSet_deleteIncidenceSet,
+    Set.ncard_diff (H.incidenceSet_subset v),
+    ncard_incidenceSet_eq_degree,
+    ncard_edgeSet_finsetStar hv]
 
 lemma centerReplacement_cliqueFree
     (G H : SimpleGraph α) (hHG : H ≤ G) (hHtri : H.CliqueFree 3)
