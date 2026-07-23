@@ -22,13 +22,13 @@ jobs:
           build: "false"
           test: "false"
           lint: "false"
-      - name: Check alternative proof module
+      - name: Check alternative proof modules
         id: lean-check
         continue-on-error: true
         shell: bash
         run: |
           set -o pipefail
-          lake build FormalConjectures.WrittenOnTheWallII.GraphConjecture2Alternative \
+          lake build FormalConjectures.WrittenOnTheWallII.GraphConjecture2AlternativeLocalBound \
             2>&1 | tee wow2-lean.log
       - name: Upload focused Lean log
         if: always()
