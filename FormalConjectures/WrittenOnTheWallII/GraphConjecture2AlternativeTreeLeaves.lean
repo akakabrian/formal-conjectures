@@ -45,9 +45,14 @@ lemma tree_pair_degree_le_leafCount_add_two
   let f : α → ℤ := fun x => (T.degree x : ℤ) - 2
   haveI : Nontrivial α := ⟨⟨u, v, huv.ne⟩⟩
   have huniv : (Finset.univ : Finset α) = L ∪ I := by
-    rw [L, I, Finset.filter_union_filter_neg_eq]
+    ext x
+    simp [L, I]
   have hdisj : Disjoint L I := by
-    exact Finset.disjoint_filter_filter_neg
+    refine Finset.disjoint_left.mpr ?_
+    intro x hxL hxI
+    have hx1 : T.degree x = 1 := (Finset.mem_filter.mp hxL).2
+    have hxne : T.degree x ≠ 1 := (Finset.mem_filter.mp hxI).2
+    exact hxne hx1
   have hedge := hT.card_edgeFinset
   have hsumdegNat := T.sum_degrees_eq_twice_card_edges
   have hedgeZ : (T.edgeFinset.card : ℤ) + 1 = Fintype.card α := by
@@ -64,7 +69,7 @@ lemma tree_pair_degree_le_leafCount_add_two
     rw [show (∑ x, f x) = (∑ x, (T.degree x : ℤ)) - ∑ _x : α, (2 : ℤ) by
       simp [f, Finset.sum_sub_distrib]]
     rw [hsumdegZ]
-    simp [nsmul_eq_mul]
+    simp
     ring
   have hsplit : (∑ x, f x) = (∑ x ∈ L, f x) + ∑ x ∈ I, f x := by
     rw [huniv, Finset.sum_union hdisj]
@@ -85,28 +90,45 @@ lemma tree_pair_degree_le_leafCount_add_two
     dsimp [f]
     exact sub_nonneg.mpr (by exact_mod_cast htwo)
   have hleaf : (L.card : ℤ) = 2 + ∑ x ∈ I, f x := by
-    linarith [hsumdiff, hsplit, hsumL]
+    rw [hsumdiff, hsumL] at hsplit
+    omega
   have hLnonneg : 0 ≤ (L.card : ℤ) := by positivity
   by_cases huI : u ∈ I
   · by_cases hvI : v ∈ I
     · have hpair : f u + f v ≤ ∑ x ∈ I, f x := by
         exact I.add_le_sum hnonneg huI hvI huv.ne
       change (T.degree u : ℤ) + T.degree v ≤ (L.card : ℤ) + 2
+      rw [hleaf]
       dsimp [f] at hpair
       omega
-    · have hv1 : T.degree v = 1 := by simpa [I] using hvI
+    · have hv1 : T.degree v = 1 := by
+        by_contra hvne
+        apply hvI
+        change v ∈ Finset.univ.filter (fun x => T.degree x ≠ 1)
+        exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, hvne⟩
       have huBound : f u ≤ ∑ x ∈ I, f x := I.single_le_sum hnonneg huI
       change (T.degree u : ℤ) + T.degree v ≤ (L.card : ℤ) + 2
+      rw [hleaf, hv1]
       dsimp [f] at huBound
       omega
-  · have hu1 : T.degree u = 1 := by simpa [I] using huI
+  · have hu1 : T.degree u = 1 := by
+      by_contra hune
+      apply huI
+      change u ∈ Finset.univ.filter (fun x => T.degree x ≠ 1)
+      exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, hune⟩
     by_cases hvI : v ∈ I
     · have hvBound : f v ≤ ∑ x ∈ I, f x := I.single_le_sum hnonneg hvI
       change (T.degree u : ℤ) + T.degree v ≤ (L.card : ℤ) + 2
+      rw [hleaf, hu1]
       dsimp [f] at hvBound
       omega
-    · have hv1 : T.degree v = 1 := by simpa [I] using hvI
+    · have hv1 : T.degree v = 1 := by
+        by_contra hvne
+        apply hvI
+        change v ∈ Finset.univ.filter (fun x => T.degree x ≠ 1)
+        exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, hvne⟩
       change (T.degree u : ℤ) + T.degree v ≤ (L.card : ℤ) + 2
+      rw [hu1, hv1]
       omega
 
 lemma tree_pair_degree_sub_two_le_leafCount
@@ -114,6 +136,10 @@ lemma tree_pair_degree_sub_two_le_leafCount
     (T.degree u : ℝ) + T.degree v - 2 ≤
       ((Finset.univ.filter (fun x => T.degree x = 1)).card : ℝ) := by
   have h := tree_pair_degree_le_leafCount_add_two T hT huv
-  exact_mod_cast h
+  have hR :
+      (T.degree u : ℝ) + T.degree v ≤
+        ((Finset.univ.filter (fun x => T.degree x = 1)).card : ℝ) + 2 := by
+    exact_mod_cast h
+  linarith
 
 end WrittenOnTheWallII.GraphConjecture2.Alternative
