@@ -14,18 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -/
 
-import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.MinimalCounterexample
-import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.SmallGates
-import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorSquareNormalization
-import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.ModElevenReduction
+import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.FinalReduction
 
 /-!
 # Erdős–Straus foundation axiom audit
 
 This standalone Lean script emits the axiom dependencies of the principal
-strict-denominator reductions through the corrected modulo-9240 sieve. It is
-run with `lake env lean` rather than built as a project module because Lean
-does not permit `#print axioms` inside a `module` file.
+strict-denominator reductions, the corrected modulo-9240 sieve, and the final
+conditional proof architecture. It is run with `lake env lean` rather than
+built as a project module because Lean does not permit `#print axioms` inside
+a `module` file.
 -/
 
 #print axioms ErdosStraus.HasDistinctDecomposition.toRational
@@ -62,3 +60,5 @@ does not permit `#print axioms` inside a `module` file.
 #print axioms ErdosStraus.prime_counterexample_mod_one_three_two_zero
 #print axioms ErdosStraus.prime_counterexample_mod_nine_two_four_zero
 #print axioms ErdosStraus.exists_prime_counterexample_mod_nine_two_four_zero
+#print axioms ErdosStraus.hasDistinctDecomposition_of_residualPrimeCoverage
+#print axioms ErdosStraus.rational_erdos_straus_of_residualPrimeCoverage
