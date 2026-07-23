@@ -1,0 +1,45 @@
+name: WOWII Conjecture 2 Alternative Proof
+
+on:
+  push:
+    branches:
+      - agent/wow2-triangle-free-proof
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: wowii2-alternative-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: leanprover/lean-action@v1
+        with:
+          build: "false"
+          test: "false"
+          lint: "false"
+      - name: Check alternative proof modules
+        id: lean-check
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          lake build FormalConjectures.WrittenOnTheWallII.GraphConjecture2AlternativeTreeLeaves \
+            2>&1 | tee wow2-lean.log
+      - name: Upload focused Lean log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wow2-lean-log
+          path: wow2-lean.log
+      - name: Propagate Lean failure
+        if: steps.lean-check.outcome == 'failure'
+        run: exit 1
