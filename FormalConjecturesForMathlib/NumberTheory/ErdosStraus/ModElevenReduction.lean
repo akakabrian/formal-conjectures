@@ -174,7 +174,6 @@ theorem prime_counterexample_mod_nine_two_four_zero
   rw [← hmod1320] at h1320
   rw [← hmod168] at h168
   dsimp [IsModElevenResidue] at h1320
-  dsimp [IsMordellResidue] at h168
   dsimp [IsModNineTwoFourZeroResidue]
   rcases h1320 with h1 | h49 | h169 | h289 | h361 | h529 |
       h721 | h841 | h889 | h961 | h1081 | h1201 <;>
