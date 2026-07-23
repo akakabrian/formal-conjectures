@@ -22,11 +22,25 @@ jobs:
           test: false
           lint: false
           mk_all-check: false
-      - name: Build Erdős 242 modules
+
+      - name: Audit forbidden proof shortcuts
+        id: forbidden-audit
+        continue-on-error: true
+        run: |
+          matches="$(rg -n --glob '*.lean' \
+            '\b(sorry|admit|native_decide)\b|^[[:space:]]*(unsafe[[:space:]]+)?axiom[[:space:]]' \
+            FormalConjecturesForMathlib/NumberTheory/ErdosStraus || true)"
+          if [ -n "$matches" ]; then
+            printf '%s\n' "$matches" | tee erdos-242-forbidden.log
+            exit 1
+          fi
+          echo "No forbidden proof shortcuts found." | tee erdos-242-forbidden.log
+
+      - name: Build Erdős 242 modules with warnings as errors
         id: targeted-build
         continue-on-error: true
         run: |
-          lake build \
+          lake --wfail build \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Basic \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.ElementaryFamilies \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Scaling \
@@ -35,13 +49,33 @@ jobs:
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.TypeIIFactorPair \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorResidues \
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.SmallGates \
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.AxiomAudit \
             > erdos-242-build.log 2>&1
+
+      - name: Emit axiom dependencies
+        id: axiom-audit
+        continue-on-error: true
+        run: |
+          lake env lean \
+            FormalConjecturesForMathlib/NumberTheory/ErdosStraus/AxiomAudit.lean \
+            > erdos-242-axioms.log 2>&1
+          if rg -n 'sorryAx' erdos-242-axioms.log; then
+            exit 1
+          fi
+
       - name: Upload diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: erdos-242-build-log
-          path: erdos-242-build.log
+          name: erdos-242-audit-logs
+          path: |
+            erdos-242-build.log
+            erdos-242-axioms.log
+            erdos-242-forbidden.log
+
       - name: Fail after diagnostics
-        if: steps.targeted-build.outcome == 'failure'
+        if: >-
+          steps.forbidden-audit.outcome == 'failure' ||
+          steps.targeted-build.outcome == 'failure' ||
+          steps.axiom-audit.outcome == 'failure'
         run: exit 1
