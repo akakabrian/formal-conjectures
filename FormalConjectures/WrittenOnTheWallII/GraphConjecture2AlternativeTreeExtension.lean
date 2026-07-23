@@ -65,6 +65,9 @@ lemma leafCount_le_Ls_of_isTree_le
   apply le_csSup
   · refine ⟨Fintype.card α, ?_⟩
     rintro x ⟨U, hU, rfl⟩
+    change
+      ((U.verts.toFinset.filter (fun v => U.degree v = 1)).card : ℝ) ≤
+        (Fintype.card α : ℝ)
     exact_mod_cast
       (Finset.card_le_univ
         (U.verts.toFinset.filter (fun v => U.degree v = 1)))
