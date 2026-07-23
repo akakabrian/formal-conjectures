@@ -17,14 +17,16 @@ limitations under the License.
 import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.MinimalCounterexample
 import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.SmallGates
 import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorSquareNormalization
+import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.SmallGateResidues
 
 /-!
 # Erdős–Straus foundation axiom audit
 
 This standalone Lean script emits the axiom dependencies of the principal
-helper theorems used in the strict-denominator foundation and divisor-square
-normalization. It is run with `lake env lean` rather than built as a project
-module because Lean does not permit `#print axioms` inside a `module` file.
+helper theorems used in the strict-denominator foundation, divisor-square
+normalization, and first exact prime-factor gate characterizations. It is run
+with `lake env lean` rather than built as a project module because Lean does
+not permit `#print axioms` inside a `module` file.
 -/
 
 #print axioms ErdosStraus.HasDistinctDecomposition.toRational
@@ -42,3 +44,7 @@ module because Lean does not permit `#print axioms` inside a `module` file.
 #print axioms ErdosStraus.divisorSquare_hasDistinctDecomposition
 #print axioms ErdosStraus.coprime_offset_of_prime
 #print axioms ErdosStraus.prime_divisorSquare_hasDistinctDecomposition
+#print axioms ErdosStraus.oppositeCoprimeDivisors_seven_of_prime_divisor_nonresidue
+#print axioms ErdosStraus.dSeven_gate_hasDistinctDecomposition
+#print axioms ErdosStraus.hasOppositeCoprimeDivisors_three_iff_exists_prime_divisor_mod_three_two
+#print axioms ErdosStraus.hasOppositeCoprimeDivisors_seven_iff_exists_prime_divisor_nonresidue
