@@ -48,8 +48,9 @@ theorem exists_prime_counterexample_one_mod_twenty_four
   have hpmod : p % 24 = 1 :=
     counterexample_mod_twenty_four_eq_one p hpCounter.1 hpCounter.2
   have hpPrime : p.Prime := by
+    have hpTwo : 2 ≤ p := hpCounter.1.le
     rw [Nat.prime_iff_not_exists_mul_eq]
-    refine ⟨by omega, ?_⟩
+    refine ⟨hpTwo, ?_⟩
     rintro ⟨a, b, ha, hb, hab⟩
     have ha0 : a ≠ 0 := by
       intro hzero
