@@ -8,7 +8,7 @@ on:
       - "erdos-242-mordell-reduction"
       - "erdos-242-small-gate-residues"
       - "erdos-242-mod-eleven-reduction"
-      - "erdos-242-final-architecture"
+      - "erdos-242-final-reduction"
   pull_request:
     branches:
       - "main"
