@@ -196,18 +196,16 @@ lemma connected_of_maxEdge_triangleFree
     exists_adj_not_reachable_of_connected_of_not_connected G H hG hHconn
   have hne : a ≠ b := hab.ne
   have hnH : ¬ H.Adj a b := fun h => hunreach h.reachable
-  let K : SimpleGraph α := H ⊔ SimpleGraph.edge a b
-  have hKG : K ≤ G := by
+  have hKG : H ⊔ SimpleGraph.edge a b ≤ G := by
     refine sup_le hHG ?_
     exact (SimpleGraph.edge_le_iff G).2 (Or.inr hab)
-  have hKtri : K.CliqueFree 3 :=
+  have hKtri : (H ⊔ SimpleGraph.edge a b).CliqueFree 3 :=
     cliqueFree_sup_edge_of_not_reachable H hHtri hunreach
-  have hcard_le := hmax K hKG hKtri
-  have hHK : H < K := by
-    dsimp [K]
-    exact H.lt_sup_edge hne hnH
-  have hcard_lt : H.edgeFinset.card < K.edgeFinset.card :=
-    Finset.card_lt_card (SimpleGraph.edgeFinset_strict_mono hHK)
+  have hcard_le := hmax (H ⊔ SimpleGraph.edge a b) hKG hKtri
+  have hcard_lt :
+      H.edgeFinset.card < (H ⊔ SimpleGraph.edge a b).edgeFinset.card :=
+    Finset.card_lt_card
+      (SimpleGraph.edgeFinset_strict_mono (H.lt_sup_edge a b hne hnH))
   exact (Nat.not_lt_of_ge hcard_le) hcard_lt
 
 lemma maxEdgeTriangleFreeSubgraph_connected
