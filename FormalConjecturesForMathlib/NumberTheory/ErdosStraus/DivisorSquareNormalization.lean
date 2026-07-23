@@ -93,4 +93,18 @@ theorem divisorSquare_hasOppositeCoprimeDivisors
   have hdab : d ∣ a + b := hdg.dvd_of_dvd_mul_left hd_gab
   exact ⟨a, b, ha, hab, hcop, hax, hbx, hdab⟩
 
+/--
+A strict divisor-square residue certificate gives a strictly ordered
+Erdős–Straus decomposition once the offset equation and size condition hold.
+-/
+theorem divisorSquare_hasDistinctDecomposition
+    (p d x q : ℕ)
+    (hp : 0 < p) (hx : 0 < x) (hq : 0 < q) (hqx : q < x)
+    (hdp : d < p) (hpd : p + d = 4 * x)
+    (hqsq : q ∣ x ^ 2) (hdqx : d ∣ q + x)
+    (hdx : Nat.Coprime d x) :
+    HasDistinctDecomposition p :=
+  oppositeCoprimeDivisors_hasDistinctDecomposition p d x hp hx hdp hpd
+    (divisorSquare_hasOppositeCoprimeDivisors x d q hx hq hqx hqsq hdqx hdx)
+
 end ErdosStraus
