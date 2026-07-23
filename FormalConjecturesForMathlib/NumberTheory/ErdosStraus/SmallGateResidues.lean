@@ -123,11 +123,11 @@ theorem mod_three_eq_one_of_prime_divisors_mod_three_one
         apply ih ha
         intro q hq hqa
         exact hprime q hq (hqa.trans (dvd_mul_left a p))
-      simpa [Nat.mul_mod, hpmod, hamod]
+      simp [Nat.mul_mod, hpmod, hamod]
 
 /-- If all prime divisors of `x` are `1 mod 3`, the `d=3` gate fails. -/
 theorem not_hasOppositeCoprimeDivisors_three_of_prime_divisors_mod_three_one
-    (x : ℕ) (hx : 0 < x)
+    (x : ℕ) (_hx : 0 < x)
     (hprime : ∀ q : ℕ, q.Prime → q ∣ x → q % 3 = 1) :
     ¬ HasOppositeCoprimeDivisors x 3 := by
   rintro ⟨a, b, ha, hab, _, hax, hbx, hdab⟩
@@ -210,7 +210,7 @@ theorem isSevenSquareResidue_mod_of_prime_divisors
 
 /-- If all prime divisors are square residues modulo `7`, the `d=7` gate fails. -/
 theorem not_hasOppositeCoprimeDivisors_seven_of_prime_divisors_square_residue
-    (x : ℕ) (hx : 0 < x)
+    (x : ℕ) (_hx : 0 < x)
     (hprime : ∀ q : ℕ, q.Prime → q ∣ x → IsSevenSquareResidue (q % 7)) :
     ¬ HasOppositeCoprimeDivisors x 7 := by
   rintro ⟨a, b, ha, hab, _, hax, hbx, hdab⟩
