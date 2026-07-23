@@ -118,4 +118,16 @@ theorem mod_three_thirty_six_three_thirteen_family (t : ℕ) :
   · ring
   · ring
 
+/-- The complete class `145 mod 168`, obtained by splitting the quotient parity. -/
+theorem mod_one_sixty_eight_one_forty_five_family (t : ℕ) :
+    HasDistinctDecomposition (168 * t + 145) := by
+  have ht := Nat.mod_add_div t 2
+  interval_cases h : t % 2
+  · have hteq : t = 2 * (t / 2) := by omega
+    rw [hteq]
+    convert mod_three_thirty_six_one_forty_five_family (t / 2) using 1 <;> ring
+  · have hteq : t = 2 * (t / 2) + 1 := by omega
+    rw [hteq]
+    convert mod_three_thirty_six_three_thirteen_family (t / 2) using 1 <;> ring
+
 end ErdosStraus
