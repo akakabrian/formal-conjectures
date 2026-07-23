@@ -28,7 +28,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          lake build FormalConjectures.WrittenOnTheWallII.GraphConjecture2AlternativeLocalBound \
+          lake build FormalConjectures.WrittenOnTheWallII.GraphConjecture2AlternativeReplacement \
             2>&1 | tee wow2-lean.log
       - name: Upload focused Lean log
         if: always()
