@@ -32,7 +32,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          lake build FormalConjectures.WrittenOnTheWallII.GraphConjecture2AlternativeTreeExtension \
+          lake build FormalConjectures.WrittenOnTheWallII.GraphConjecture2AlternativeTreeLeaves \
             2>&1 | tee wow2-lean.log
       - name: Upload focused Lean log
         if: always()
