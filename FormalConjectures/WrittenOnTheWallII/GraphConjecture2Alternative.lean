@@ -44,6 +44,7 @@ open Classical Finset SimpleGraph
 
 set_option linter.style.ams_attribute false
 set_option linter.style.category_attribute false
+set_option linter.unusedSectionVars false
 
 variable {α : Type*} [Fintype α] [DecidableEq α]
 
@@ -202,13 +203,12 @@ lemma connected_of_maxEdge_triangleFree
   have hKtri : K.CliqueFree 3 :=
     cliqueFree_sup_edge_of_not_reachable H hHtri hunreach
   have hcard_le := hmax K hKG hKtri
-  have hcard_eq : K.edgeFinset.card = H.edgeFinset.card + 1 := by
-    exact H.card_edgeFinset_sup_edge hnH hne
-  have hbad : H.edgeFinset.card + 1 ≤ H.edgeFinset.card := by
-    calc
-      H.edgeFinset.card + 1 = K.edgeFinset.card := hcard_eq.symm
-      _ ≤ H.edgeFinset.card := hcard_le
-  exact (Nat.not_succ_le_self H.edgeFinset.card) hbad
+  have hHK : H < K := by
+    dsimp [K]
+    exact H.lt_sup_edge hne hnH
+  have hcard_lt : H.edgeFinset.card < K.edgeFinset.card :=
+    Finset.card_lt_card (SimpleGraph.edgeFinset_strict_mono hHK)
+  exact (Nat.not_lt_of_ge hcard_le) hcard_lt
 
 lemma maxEdgeTriangleFreeSubgraph_connected
     (G : SimpleGraph α) (hG : G.Connected) :
