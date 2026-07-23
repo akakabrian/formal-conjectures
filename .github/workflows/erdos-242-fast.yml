@@ -2,9 +2,16 @@ name: Erdős 242 targeted Lean check
 
 on:
   push:
-    branches: ["erdos-242-phase1"]
+    branches:
+      - "erdos-242-phase1"
+      - "erdos-242-typeii-equivalence"
+      - "erdos-242-mordell-reduction"
+      - "erdos-242-small-gate-residues"
   pull_request:
-    branches: ["main"]
+    branches:
+      - "main"
+      - "erdos-242-phase1"
+      - "erdos-242-typeii-equivalence"
     paths:
       - "FormalConjecturesForMathlib/NumberTheory/ErdosStraus/**"
       - ".github/workflows/erdos-242-fast.yml"
@@ -40,16 +47,30 @@ jobs:
         id: targeted_build
         continue-on-error: true
         run: |
-          lake --wfail build \
-            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Basic \
-            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.ElementaryFamilies \
-            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Scaling \
-            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Reduction \
-            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.MinimalCounterexample \
-            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.TypeIIFactorPair \
-            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorResidues \
-            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.SmallGates \
-            > erdos-242-build.log 2>&1
+          targets=(
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Basic
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.ElementaryFamilies
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Scaling
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Reduction
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.MinimalCounterexample
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.TypeIIFactorPair
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorResidues
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorSquareNormalization
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.SmallGates
+          )
+
+          optional_modules=(
+            SmallGateResidues
+            MordellFamilies
+            MordellReduction
+          )
+          for module in "${optional_modules[@]}"; do
+            if [[ -f "FormalConjecturesForMathlib/NumberTheory/ErdosStraus/${module}.lean" ]]; then
+              targets+=("FormalConjecturesForMathlib.NumberTheory.ErdosStraus.${module}")
+            fi
+          done
+
+          lake --wfail build "${targets[@]}" > erdos-242-build.log 2>&1
 
       - name: Emit axiom dependencies
         id: axiom_audit
