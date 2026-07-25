@@ -66,6 +66,7 @@ jobs:
           optional_modules=(
             ResidueObstruction
             SmallGateResidues
+            ModElevenGates
             MordellFamilies
             MordellReduction
             ModElevenFamilies
