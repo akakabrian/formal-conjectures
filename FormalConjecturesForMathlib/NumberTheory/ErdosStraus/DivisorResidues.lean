@@ -34,6 +34,27 @@ def HasOppositeCoprimeDivisors (x d : ℕ) : Prop :=
     0 < a ∧ a < b ∧ Nat.Coprime a b ∧ a ∣ x ∧ b ∣ x ∧ d ∣ a + b
 
 /--
+A coprime product divisor with opposite residues can be ordered into a
+normalized opposite-divisor certificate.
+-/
+theorem hasOppositeCoprimeDivisors_of_product_dvd
+    (x d a b : ℕ) (ha : 0 < a) (hb : 0 < b) (hne : a ≠ b)
+    (hcop : Nat.Coprime a b) (habx : a * b ∣ x) (hdab : d ∣ a + b) :
+    HasOppositeCoprimeDivisors x d := by
+  rcases habx with ⟨c, hxc⟩
+  have hax : a ∣ x := by
+    refine ⟨b * c, ?_⟩
+    rw [hxc]
+    ring
+  have hbx : b ∣ x := by
+    refine ⟨a * c, ?_⟩
+    rw [hxc]
+    ring
+  rcases lt_or_gt_of_ne hne with hab | hba
+  · exact ⟨a, b, ha, hab, hcop, hax, hbx, hdab⟩
+  · exact ⟨b, a, hb, hba, hcop.symm, hbx, hax, by simpa [Nat.add_comm] using hdab⟩
+
+/--
 A normalized opposite-divisor pair gives a strictly ordered Type-II
 Erdős–Straus certificate whenever `d < p` and `p+d=4x`.
 -/
