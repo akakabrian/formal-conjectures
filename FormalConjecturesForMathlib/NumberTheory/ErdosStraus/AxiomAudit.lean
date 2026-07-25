@@ -17,13 +17,14 @@ limitations under the License.
 import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.FinalReduction
 import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.ResidueObstruction
 import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.ModElevenGates
+import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.ModElevenObstruction
 
 /-!
 # Erdős–Straus foundation axiom audit
 
 This standalone Lean script emits the axiom dependencies of the principal
 strict-denominator reductions, the corrected modulo-9240 sieve, the generic
-residue obstruction, the `d=11` prime-factor triggers, and the final
+residue obstruction, the `d=11` trigger and obstruction layers, and the final
 conditional proof architecture. It is run with `lake env lean` rather than
 built as a project module because Lean does not permit `#print axioms` inside
 a `module` file.
@@ -51,6 +52,10 @@ a `module` file.
 #print axioms ErdosStraus.oppositeCoprimeDivisors_eleven_of_prime_divisor_trigger
 #print axioms ErdosStraus.three_dvd_offset_eleven_of_mod_twenty_four_one
 #print axioms ErdosStraus.dEleven_gate_hasDistinctDecomposition
+#print axioms ErdosStraus.residualPrime_dEleven_gate_hasDistinctDecomposition
+#print axioms ErdosStraus.isElevenSquareResidue_mul_mod
+#print axioms ErdosStraus.elevenSquareResidues_not_opposite
+#print axioms ErdosStraus.not_hasOppositeCoprimeDivisors_eleven_of_prime_divisors_square_residue
 #print axioms ErdosStraus.mod_one_twenty_seventy_three_family
 #print axioms ErdosStraus.mod_one_twenty_ninety_seven_family
 #print axioms ErdosStraus.mod_one_sixty_eight_seventy_three_family
