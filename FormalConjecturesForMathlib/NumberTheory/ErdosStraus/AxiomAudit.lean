@@ -62,3 +62,4 @@ a `module` file.
 #print axioms ErdosStraus.exists_prime_counterexample_mod_nine_two_four_zero
 #print axioms ErdosStraus.hasDistinctDecomposition_of_residualPrimeCoverage
 #print axioms ErdosStraus.rational_erdos_straus_of_residualPrimeCoverage
+#print axioms ErdosStraus.ordinary_erdos_straus_of_residualPrimeCoverage
