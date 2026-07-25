@@ -121,4 +121,19 @@ theorem dEleven_gate_hasDistinctDecomposition
   exact oppositeCoprimeDivisors_eleven_of_prime_divisor_trigger
     x q h3x hqprime hqx hqmod
 
+/--
+For `p ≡ 1 mod 24`, the residue trigger needs no separately supplied
+`3 ∣ x` hypothesis.
+-/
+theorem residualPrime_dEleven_gate_hasDistinctDecomposition
+    (p x q : ℕ) (hp : 11 < p) (hpmod : p % 24 = 1) (hx : 0 < x)
+    (hpx : p + 11 = 4 * x) (hqprime : q.Prime) (hqx : q ∣ x)
+    (hqmod : q % 11 = 7 ∨ q % 11 = 8 ∨ q % 11 = 10) :
+    HasDistinctDecomposition p := by
+  apply dEleven_gate_hasDistinctDecomposition p x q hp hx hpx
+  · exact three_dvd_offset_eleven_of_mod_twenty_four_one p x hpmod hpx
+  · exact hqprime
+  · exact hqx
+  · exact hqmod
+
 end ErdosStraus
