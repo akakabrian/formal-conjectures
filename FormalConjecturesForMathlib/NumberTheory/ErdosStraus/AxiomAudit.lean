@@ -15,15 +15,16 @@ limitations under the License.
 -/
 
 import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.FinalReduction
+import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.ResidueObstruction
 
 /-!
 # Erdős–Straus foundation axiom audit
 
 This standalone Lean script emits the axiom dependencies of the principal
-strict-denominator reductions, the corrected modulo-9240 sieve, and the final
-conditional proof architecture. It is run with `lake env lean` rather than
-built as a project module because Lean does not permit `#print axioms` inside
-a `module` file.
+strict-denominator reductions, the corrected modulo-9240 sieve, the generic
+residue obstruction, and the final conditional proof architecture. It is run
+with `lake env lean` rather than built as a project module because Lean does
+not permit `#print axioms` inside a `module` file.
 -/
 
 #print axioms ErdosStraus.HasDistinctDecomposition.toRational
@@ -35,7 +36,10 @@ a `module` file.
 #print axioms ErdosStraus.counterexample_mod_twenty_four_eq_one
 #print axioms ErdosStraus.exists_prime_counterexample_one_mod_twenty_four
 #print axioms ErdosStraus.typeII_factor_pair_hasDistinctDecomposition
+#print axioms ErdosStraus.hasOppositeCoprimeDivisors_of_product_dvd
 #print axioms ErdosStraus.oppositeCoprimeDivisors_hasDistinctDecomposition
+#print axioms ErdosStraus.residueProperty_mod_of_prime_divisors
+#print axioms ErdosStraus.not_hasOppositeCoprimeDivisors_of_residueProperty
 #print axioms ErdosStraus.dThree_gate_hasDistinctDecomposition
 #print axioms ErdosStraus.divisorSquare_hasOppositeCoprimeDivisors
 #print axioms ErdosStraus.divisorSquare_hasDistinctDecomposition
