@@ -67,6 +67,7 @@ jobs:
             ResidueObstruction
             SmallGateResidues
             ModElevenGates
+            ModElevenObstruction
             MordellFamilies
             MordellReduction
             ModElevenFamilies
