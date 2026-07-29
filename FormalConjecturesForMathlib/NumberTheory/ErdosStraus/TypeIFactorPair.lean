@@ -129,4 +129,51 @@ theorem unit_typeI_gate_hasDistinctDecomposition
   exact fixedA_typeI_gate_hasDistinctDecomposition p 1 x s d (by omega)
     (by norm_num) hx hs hd hdp (by omega) hps (by simpa using hpd)
 
+/--
+For a target `p` congruent to `1 mod 8`, any divisor of `p+2` congruent to
+`7 mod 8` opens the fixed-`a` Type-I gate with `a=2`.
+-/
+theorem divisor_mod_eight_seven_hasDistinctDecomposition
+    (p d : ℕ)
+    (hp : 2 < p)
+    (hpmod : p % 8 = 1)
+    (hdvd : d ∣ p + 2)
+    (hdmod : d % 8 = 7) :
+    HasDistinctDecomposition p := by
+  have hd_le : d ≤ p + 2 := Nat.le_of_dvd (by omega) hdvd
+  have hd : 0 < d := by omega
+  have hdp : d < p := by omega
+  rcases hdvd with ⟨s, hps⟩
+  have hs : 0 < s := by
+    apply Nat.pos_of_ne_zero
+    intro hs0
+    subst s
+    simp at hps
+  have hsum_mod : (p + d) % 8 = 0 := by omega
+  let c := (p + d) / 8
+  have hpc : p + d = 8 * c := by
+    have hdiv := Nat.mod_add_div (p + d) 8
+    dsimp [c]
+    omega
+  have hc : 0 < c := by omega
+  apply fixedA_typeI_gate_hasDistinctDecomposition
+      p 2 c s d (by omega) (by norm_num) hc hs hd hdp hp hps
+  calc
+    p + d = 8 * c := hpc
+    _ = 4 * (2 * c) := by ring
+
+/--
+A counterexample congruent to `1 mod 8` has no divisor of `p+2` congruent to
+`7 mod 8`.
+-/
+theorem counterexample_no_divisor_mod_eight_seven
+    (p : ℕ)
+    (hp : 2 < p)
+    (hpmod : p % 8 = 1)
+    (hcounter : ¬ HasDistinctDecomposition p) :
+    ∀ d : ℕ, d ∣ p + 2 → d % 8 ≠ 7 := by
+  intro d hdvd hdmod
+  exact hcounter
+    (divisor_mod_eight_seven_hasDistinctDecomposition p d hp hpmod hdvd hdmod)
+
 end ErdosStraus
