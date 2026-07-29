@@ -15,6 +15,7 @@ limitations under the License.
 -/
 
 import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.FinalReduction
+import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.SmallGates
 
 /-!
 # Erdős–Straus foundation axiom audit
