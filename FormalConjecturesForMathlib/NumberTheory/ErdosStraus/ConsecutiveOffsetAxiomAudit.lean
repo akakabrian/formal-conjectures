@@ -30,3 +30,5 @@ consecutive-offset theorems.
 #print axioms ErdosStraus.unit_typeI_gate_hasDistinctDecomposition
 #print axioms ErdosStraus.offset_identity
 #print axioms ErdosStraus.unit_typeI_gate_of_offset_dvd
+#print axioms ErdosStraus.divisor_mod_four_three_hasDistinctDecomposition
+#print axioms ErdosStraus.counterexample_no_divisor_mod_four_three
