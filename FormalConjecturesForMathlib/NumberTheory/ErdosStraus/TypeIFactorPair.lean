@@ -59,7 +59,7 @@ produces the exact strictly ordered formulation.
 -/
 theorem typeI_factor_pair_hasDistinctDecomposition
     (p a b c s d : ℕ)
-    (hp : 0 < p) (ha : 0 < a) (hb : 0 < b) (hc : 0 < c) (hs : 0 < s)
+    (hp : 0 < p) (ha : 0 < a) (hc : 0 < c) (hs : 0 < s)
     (hb_lt_s : b < s) (ha_lt_pb : a < p * b)
     (hab : a + p * b = d * s)
     (hpd : p + d = 4 * (a * b * c)) :
@@ -95,8 +95,25 @@ theorem typeI_factor_pair_hasDistinctDecomposition_of_offset_lt
   have hpb_lt_ds : p * b < d * s := by omega
   have hdb_lt_ds : d * b < d * s := lt_trans hdb_lt_pb hpb_lt_ds
   have hb_lt_s : b < s := (Nat.mul_lt_mul_left hd).mp hdb_lt_ds
-  exact typeI_factor_pair_hasDistinctDecomposition p a b c s d hp ha hb hc hs
+  exact typeI_factor_pair_hasDistinctDecomposition p a b c s d hp ha hc hs
     hb_lt_s ha_lt_pb hab hpd
+
+/--
+The fixed-`a`, unit-`b` Type-I gate. If `d` is a proper divisor of `p+a`
+and `p+d=4*a*c`, then the resulting certificate is strict whenever `a<p`.
+-/
+theorem fixedA_typeI_gate_hasDistinctDecomposition
+    (p a c s d : ℕ)
+    (hp : 0 < p) (ha : 0 < a) (hc : 0 < c) (hs : 0 < s)
+    (hd : 0 < d) (hdp : d < p) (hap : a < p)
+    (hpa : p + a = d * s)
+    (hpd : p + d = 4 * (a * c)) :
+    HasDistinctDecomposition p := by
+  apply typeI_factor_pair_hasDistinctDecomposition_of_offset_lt
+      p a 1 c s d hp ha (by norm_num) hc hs hd hdp
+  · simpa using hap
+  · simpa [Nat.add_comm] using hpa
+  · simpa using hpd
 
 /--
 The unit Type-I gate. If `p + 1 = d*s` and `p+d=4*x`, then the denominators
@@ -109,10 +126,7 @@ theorem unit_typeI_gate_hasDistinctDecomposition
     (hps : p + 1 = d * s)
     (hpd : p + d = 4 * x) :
     HasDistinctDecomposition p := by
-  apply typeI_factor_pair_hasDistinctDecomposition_of_offset_lt
-      p 1 1 x s d (by omega) (by norm_num) (by norm_num) hx hs hd hdp
-  · simpa using hp
-  · simpa [Nat.add_comm] using hps
-  · simpa using hpd
+  exact fixedA_typeI_gate_hasDistinctDecomposition p 1 x s d (by omega)
+    (by norm_num) hx hs hd hdp (by omega) hps (by simpa using hpd)
 
 end ErdosStraus
