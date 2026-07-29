@@ -61,7 +61,7 @@ exact strict-denominator Erdős–Straus decomposition at `x_k`.
 -/
 theorem unit_typeI_gate_of_offset_dvd
     (p m k : ℕ)
-    (hp : 1 < p) (hm : 0 < m)
+    (hp : 1 < p)
     (hpm : p + 3 = 4 * m)
     (hdp : offsetD k < p)
     (hdvd : offsetD k ∣ p + 1) :
