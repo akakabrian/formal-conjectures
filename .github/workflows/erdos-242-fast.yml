@@ -9,7 +9,7 @@ on:
       - "erdos-242-small-gate-residues"
       - "erdos-242-mod-eleven-reduction"
       - "erdos-242-final-reduction"
-      - "agent/erdos-242-consecutive-offsets"
+      - "agent/**"
   pull_request:
     branches:
       - "main"
