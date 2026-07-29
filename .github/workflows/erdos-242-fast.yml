@@ -88,9 +88,12 @@ jobs:
         id: axiom_audit
         continue-on-error: true
         run: |
-          lake env lean \
-            FormalConjecturesForMathlib/NumberTheory/ErdosStraus/AxiomAudit.lean \
-            > erdos-242-axioms.log 2>&1
+          {
+            lake env lean \
+              FormalConjecturesForMathlib/NumberTheory/ErdosStraus/AxiomAudit.lean
+            lake env lean \
+              FormalConjecturesForMathlib/NumberTheory/ErdosStraus/ConsecutiveOffsetAxiomAudit.lean
+          } > erdos-242-axioms.log 2>&1
           if grep -n 'sorryAx' erdos-242-axioms.log; then
             exit 1
           fi
