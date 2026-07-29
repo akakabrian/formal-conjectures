@@ -9,6 +9,7 @@ on:
       - "erdos-242-small-gate-residues"
       - "erdos-242-mod-eleven-reduction"
       - "erdos-242-final-reduction"
+      - "agent/**"
   pull_request:
     branches:
       - "main"
@@ -16,6 +17,7 @@ on:
       - "erdos-242-typeii-equivalence"
       - "erdos-242-mordell-reduction"
       - "erdos-242-mod-eleven-reduction"
+      - "erdos-242-final-reduction"
     paths:
       - "FormalConjecturesForMathlib/NumberTheory/ErdosStraus/**"
       - ".github/workflows/erdos-242-fast.yml"
@@ -38,8 +40,9 @@ jobs:
         id: forbidden_audit
         continue-on-error: true
         run: |
-          matches="$(rg -n --glob '*.lean' \
-            '\b(sorry|admit|native_decide)\b|^[[:space:]]*(unsafe[[:space:]]+)?axiom[[:space:]]' \
+          command -v grep >/dev/null
+          matches="$(grep -RInE --include='*.lean' \
+            '(^|[^[:alnum:]_])(sorry|admit|native_decide)([^[:alnum:]_]|$)|^[[:space:]]*(unsafe[[:space:]]+)?axiom[[:space:]]' \
             FormalConjecturesForMathlib/NumberTheory/ErdosStraus || true)"
           if [ -n "$matches" ]; then
             printf '%s\n' "$matches" | tee erdos-242-forbidden.log
@@ -58,6 +61,8 @@ jobs:
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Reduction
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.MinimalCounterexample
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.TypeIIFactorPair
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.TypeIFactorPair
+            FormalConjecturesForMathlib.NumberTheory.ErdosStraus.ConsecutiveOffsets
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorResidues
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.DivisorSquareNormalization
             FormalConjecturesForMathlib.NumberTheory.ErdosStraus.SmallGates
@@ -83,10 +88,13 @@ jobs:
         id: axiom_audit
         continue-on-error: true
         run: |
-          lake env lean \
-            FormalConjecturesForMathlib/NumberTheory/ErdosStraus/AxiomAudit.lean \
-            > erdos-242-axioms.log 2>&1
-          if rg -n 'sorryAx' erdos-242-axioms.log; then
+          {
+            lake env lean \
+              FormalConjecturesForMathlib/NumberTheory/ErdosStraus/AxiomAudit.lean
+            lake env lean \
+              FormalConjecturesForMathlib/NumberTheory/ErdosStraus/ConsecutiveOffsetAxiomAudit.lean
+          } > erdos-242-axioms.log 2>&1
+          if grep -n 'sorryAx' erdos-242-axioms.log; then
             exit 1
           fi
 

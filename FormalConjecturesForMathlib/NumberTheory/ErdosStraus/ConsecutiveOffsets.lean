@@ -1,0 +1,143 @@
+/-
+Copyright 2026 The Formal Conjectures Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-/
+module
+
+public import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.TypeIFactorPair
+
+@[expose] public section
+
+/-!
+# Consecutive Erdős–Straus offsets
+
+For a residual prime written as `p + 3 = 4*m`, the complete offset sequence is
+
+`x_k = m+k` and `d_k = 4*k+3`.
+
+The identity `p+d_k=4*x_k` holds for every `k`. A divisor `d_k ∣ p+1`
+therefore activates the unit Type-I gate at that offset.
+-/
+
+namespace ErdosStraus
+
+/-- The consecutive candidate denominator at offset `k`. -/
+def offsetX (m k : ℕ) : ℕ := m + k
+
+/-- The corresponding offset `4*k+3`. -/
+def offsetD (k : ℕ) : ℕ := 4 * k + 3
+
+@[simp] theorem offsetX_zero (m : ℕ) : offsetX m 0 = m := by
+  simp [offsetX]
+
+@[simp] theorem offsetX_succ (m k : ℕ) : offsetX m (k + 1) = offsetX m k + 1 := by
+  simp [offsetX, Nat.add_assoc]
+
+@[simp] theorem offsetD_succ (k : ℕ) : offsetD (k + 1) = offsetD k + 4 := by
+  simp [offsetD]
+  omega
+
+/-- The invariant tying every consecutive candidate to the same target `p`. -/
+theorem offset_identity
+    (p m k : ℕ) (hpm : p + 3 = 4 * m) :
+    p + offsetD k = 4 * offsetX m k := by
+  dsimp [offsetD, offsetX]
+  omega
+
+/--
+At offset `k`, a factorization `x_k=a*c` together with the divisor condition
+`d_k ∣ p+a` opens the dynamic fixed-`a` Type-I gate.
+-/
+theorem fixedA_typeI_gate_at_offset
+    (p m k a c : ℕ)
+    (hp : 0 < p) (ha : 0 < a) (hc : 0 < c) (hap : a < p)
+    (hpm : p + 3 = 4 * m)
+    (hfactor : offsetX m k = a * c)
+    (hdp : offsetD k < p)
+    (hdvd : offsetD k ∣ p + a) :
+    HasDistinctDecomposition p := by
+  apply fixedA_typeI_gate_of_dvd p a c (offsetD k) hp ha hc
+  · dsimp [offsetD]
+    omega
+  · exact hdp
+  · exact hap
+  · exact hdvd
+  · calc
+      p + offsetD k = 4 * offsetX m k := offset_identity p m k hpm
+      _ = 4 * (a * c) := by rw [hfactor]
+
+/--
+If one offset `d_k` divides `p+1`, the unit Type-I construction gives the
+exact strict-denominator Erdős–Straus decomposition at `x_k`.
+-/
+theorem unit_typeI_gate_of_offset_dvd
+    (p m k : ℕ)
+    (hp : 1 < p)
+    (hpm : p + 3 = 4 * m)
+    (hdp : offsetD k < p)
+    (hdvd : offsetD k ∣ p + 1) :
+    HasDistinctDecomposition p := by
+  rcases hdvd with ⟨s, hps⟩
+  have hs : 0 < s := by
+    apply Nat.pos_of_ne_zero
+    intro hs0
+    subst s
+    simp at hps
+  apply unit_typeI_gate_hasDistinctDecomposition
+      p (offsetD k) (offsetX m k) s hp
+  · dsimp [offsetD]
+    omega
+  · dsimp [offsetX]
+    omega
+  · exact hs
+  · exact hdp
+  · exact hps
+  · exact offset_identity p m k hpm
+
+/--
+Any divisor of `p+1` that is `3 mod 4` occurs in the complete offset sequence
+and opens a strict unit Type-I gate.
+-/
+theorem divisor_mod_four_three_hasDistinctDecomposition
+    (p m r : ℕ)
+    (hp : 1 < p)
+    (hpm : p + 3 = 4 * m)
+    (hrdvd : r ∣ p + 1)
+    (hrmod : r % 4 = 3) :
+    HasDistinctDecomposition p := by
+  have hr_le : r ≤ p + 1 := Nat.le_of_dvd (by omega) hrdvd
+  have hr_lt_p : r < p := by omega
+  have hoffset : offsetD (r / 4) = r := by
+    have hdiv := Nat.mod_add_div r 4
+    dsimp [offsetD]
+    omega
+  apply unit_typeI_gate_of_offset_dvd p m (r / 4) hp hpm
+  · simpa [hoffset] using hr_lt_p
+  · simpa [hoffset] using hrdvd
+
+/--
+A counterexample in the residual class has no divisor of `p+1` congruent to
+`3 mod 4`.
+-/
+theorem counterexample_no_divisor_mod_four_three
+    (p m : ℕ)
+    (hp : 1 < p)
+    (hpm : p + 3 = 4 * m)
+    (hcounter : ¬ HasDistinctDecomposition p) :
+    ∀ r : ℕ, r ∣ p + 1 → r % 4 ≠ 3 := by
+  intro r hrdvd hrmod
+  exact hcounter
+    (divisor_mod_four_three_hasDistinctDecomposition p m r hp hpm hrdvd hrmod)
+
+end ErdosStraus

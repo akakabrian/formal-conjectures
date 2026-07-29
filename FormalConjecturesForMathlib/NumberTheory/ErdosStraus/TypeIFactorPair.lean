@@ -1,0 +1,199 @@
+/-
+Copyright 2026 The Formal Conjectures Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-/
+module
+
+public import FormalConjecturesForMathlib.NumberTheory.ErdosStraus.Basic
+
+@[expose] public section
+
+/-!
+# Type-I factor-pair certificates
+
+If positive integers satisfy
+
+`p + d = 4 * a * b * c` and `a + p * b = d * s`,
+
+then `a*b*c`, `a*c*s`, and `p*b*c*s` give an Erdős–Straus decomposition
+for `p`. This complements the Type-II factor-pair identity.
+-/
+
+namespace ErdosStraus
+
+/-- The polynomial identity underlying the Type-I factor-pair certificate. -/
+theorem typeI_factor_pair_identity
+    (p a b c s d : ℕ)
+    (hab : a + p * b = d * s)
+    (hpd : p + d = 4 * (a * b * c)) :
+    4 * (a * b * c) * (a * c * s) * (p * b * c * s) =
+      p * ((a * b * c) * (a * c * s) +
+        (a * b * c) * (p * b * c * s) +
+        (a * c * s) * (p * b * c * s)) := by
+  calc
+    4 * (a * b * c) * (a * c * s) * (p * b * c * s)
+        = p * a * b * c ^ 2 * s * ((p + d) * s) := by
+          rw [hpd]
+          ring
+    _ = p * a * b * c ^ 2 * s * (p * s + (a + p * b)) := by
+      rw [hab]
+      ring
+    _ = p * ((a * b * c) * (a * c * s) +
+        (a * b * c) * (p * b * c * s) +
+        (a * c * s) * (p * b * c * s)) := by ring
+
+/--
+A positive Type-I factor-pair certificate with `b < s` and `a < p*b`
+produces the exact strictly ordered formulation.
+-/
+theorem typeI_factor_pair_hasDistinctDecomposition
+    (p a b c s d : ℕ)
+    (hp : 0 < p) (ha : 0 < a) (hc : 0 < c) (hs : 0 < s)
+    (hb_lt_s : b < s) (ha_lt_pb : a < p * b)
+    (hab : a + p * b = d * s)
+    (hpd : p + d = 4 * (a * b * c)) :
+    HasDistinctDecomposition p := by
+  have hac : 0 < a * c := Nat.mul_pos ha hc
+  have hcs : 0 < c * s := Nat.mul_pos hc hs
+  refine ⟨a * b * c, a * c * s, p * b * c * s, ?_, ?_, ?_, ?_⟩
+  · omega
+  · calc
+      a * b * c = (a * c) * b := by ring
+      _ < (a * c) * s := Nat.mul_lt_mul_of_pos_left hb_lt_s hac
+      _ = a * c * s := by ring
+  · calc
+      a * c * s = (c * s) * a := by ring
+      _ < (c * s) * (p * b) := Nat.mul_lt_mul_of_pos_left ha_lt_pb hcs
+      _ = p * b * c * s := by ring
+  · exact typeI_factor_pair_identity p a b c s d hab hpd
+
+/--
+The offset inequality `d < p` forces `b < s` in a positive Type-I
+certificate. Thus the only additional strictness condition is `a < p*b`.
+-/
+theorem typeI_factor_pair_hasDistinctDecomposition_of_offset_lt
+    (p a b c s d : ℕ)
+    (hp : 0 < p) (ha : 0 < a) (hb : 0 < b) (hc : 0 < c)
+    (hs : 0 < s) (hd : 0 < d) (hdp : d < p)
+    (ha_lt_pb : a < p * b)
+    (hab : a + p * b = d * s)
+    (hpd : p + d = 4 * (a * b * c)) :
+    HasDistinctDecomposition p := by
+  have hdb_lt_pb : d * b < p * b :=
+    Nat.mul_lt_mul_of_pos_right hdp hb
+  have hpb_lt_ds : p * b < d * s := by omega
+  have hdb_lt_ds : d * b < d * s := lt_trans hdb_lt_pb hpb_lt_ds
+  have hb_lt_s : b < s := (Nat.mul_lt_mul_left hd).mp hdb_lt_ds
+  exact typeI_factor_pair_hasDistinctDecomposition p a b c s d hp ha hc hs
+    hb_lt_s ha_lt_pb hab hpd
+
+/--
+The fixed-`a`, unit-`b` Type-I gate. If `d` is a proper divisor of `p+a`
+and `p+d=4*a*c`, then the resulting certificate is strict whenever `a<p`.
+-/
+theorem fixedA_typeI_gate_hasDistinctDecomposition
+    (p a c s d : ℕ)
+    (hp : 0 < p) (ha : 0 < a) (hc : 0 < c) (hs : 0 < s)
+    (hd : 0 < d) (hdp : d < p) (hap : a < p)
+    (hpa : p + a = d * s)
+    (hpd : p + d = 4 * (a * c)) :
+    HasDistinctDecomposition p := by
+  apply typeI_factor_pair_hasDistinctDecomposition_of_offset_lt
+      p a 1 c s d hp ha (by norm_num) hc hs hd hdp
+  · simpa using hap
+  · simpa [Nat.add_comm] using hpa
+  · simpa using hpd
+
+/--
+A proper divisor `d ∣ p+a` directly supplies the quotient required by the
+fixed-`a` Type-I gate.
+-/
+theorem fixedA_typeI_gate_of_dvd
+    (p a c d : ℕ)
+    (hp : 0 < p) (ha : 0 < a) (hc : 0 < c)
+    (hd : 0 < d) (hdp : d < p) (hap : a < p)
+    (hpa : d ∣ p + a)
+    (hpd : p + d = 4 * (a * c)) :
+    HasDistinctDecomposition p := by
+  rcases hpa with ⟨s, hpa⟩
+  have hs : 0 < s := by
+    apply Nat.pos_of_ne_zero
+    intro hs0
+    subst s
+    simp at hpa
+  exact fixedA_typeI_gate_hasDistinctDecomposition p a c s d hp ha hc hs
+    hd hdp hap hpa hpd
+
+/--
+The unit Type-I gate. If `p + 1 = d*s` and `p+d=4*x`, then the denominators
+`x`, `x*s`, and `p*x*s` give a strict decomposition whenever `d < p`.
+-/
+theorem unit_typeI_gate_hasDistinctDecomposition
+    (p d x s : ℕ)
+    (hp : 1 < p) (hd : 0 < d) (hx : 0 < x) (hs : 0 < s)
+    (hdp : d < p)
+    (hps : p + 1 = d * s)
+    (hpd : p + d = 4 * x) :
+    HasDistinctDecomposition p := by
+  exact fixedA_typeI_gate_hasDistinctDecomposition p 1 x s d (by omega)
+    (by norm_num) hx hs hd hdp (by omega) hps (by simpa using hpd)
+
+/--
+For a target `p` congruent to `1 mod 8`, any divisor of `p+2` congruent to
+`7 mod 8` opens the fixed-`a` Type-I gate with `a=2`.
+-/
+theorem divisor_mod_eight_seven_hasDistinctDecomposition
+    (p d : ℕ)
+    (hp : 2 < p)
+    (hpmod : p % 8 = 1)
+    (hdvd : d ∣ p + 2)
+    (hdmod : d % 8 = 7) :
+    HasDistinctDecomposition p := by
+  have hd_le : d ≤ p + 2 := Nat.le_of_dvd (by omega) hdvd
+  have hd : 0 < d := by omega
+  have hdp : d < p := by omega
+  rcases hdvd with ⟨s, hps⟩
+  have hs : 0 < s := by
+    apply Nat.pos_of_ne_zero
+    intro hs0
+    subst s
+    simp at hps
+  have hsum_mod : (p + d) % 8 = 0 := by omega
+  let c := (p + d) / 8
+  have hpc : p + d = 8 * c := by
+    have hdiv := Nat.mod_add_div (p + d) 8
+    dsimp [c]
+    omega
+  have hc : 0 < c := by omega
+  apply fixedA_typeI_gate_hasDistinctDecomposition
+      p 2 c s d (by omega) (by norm_num) hc hs hd hdp hp hps
+  calc
+    p + d = 8 * c := hpc
+    _ = 4 * (2 * c) := by ring
+
+/--
+A counterexample congruent to `1 mod 8` has no divisor of `p+2` congruent to
+`7 mod 8`.
+-/
+theorem counterexample_no_divisor_mod_eight_seven
+    (p : ℕ)
+    (hp : 2 < p)
+    (hpmod : p % 8 = 1)
+    (hcounter : ¬ HasDistinctDecomposition p) :
+    ∀ d : ℕ, d ∣ p + 2 → d % 8 ≠ 7 := by
+  intro d hdvd hdmod
+  exact hcounter
+    (divisor_mod_eight_seven_hasDistinctDecomposition p d hp hpmod hdvd hdmod)
+
+end ErdosStraus
