@@ -116,6 +116,26 @@ theorem fixedA_typeI_gate_hasDistinctDecomposition
   · simpa using hpd
 
 /--
+A proper divisor `d ∣ p+a` directly supplies the quotient required by the
+fixed-`a` Type-I gate.
+-/
+theorem fixedA_typeI_gate_of_dvd
+    (p a c d : ℕ)
+    (hp : 0 < p) (ha : 0 < a) (hc : 0 < c)
+    (hd : 0 < d) (hdp : d < p) (hap : a < p)
+    (hpa : d ∣ p + a)
+    (hpd : p + d = 4 * (a * c)) :
+    HasDistinctDecomposition p := by
+  rcases hpa with ⟨s, hpa⟩
+  have hs : 0 < s := by
+    apply Nat.pos_of_ne_zero
+    intro hs0
+    subst s
+    simp at hpa
+  exact fixedA_typeI_gate_hasDistinctDecomposition p a c s d hp ha hc hs
+    hd hdp hap hpa hpd
+
+/--
 The unit Type-I gate. If `p + 1 = d*s` and `p+d=4*x`, then the denominators
 `x`, `x*s`, and `p*x*s` give a strict decomposition whenever `d < p`.
 -/
