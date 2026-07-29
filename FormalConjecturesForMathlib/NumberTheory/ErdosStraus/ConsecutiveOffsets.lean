@@ -68,11 +68,10 @@ theorem unit_typeI_gate_of_offset_dvd
     HasDistinctDecomposition p := by
   rcases hdvd with ⟨s, hps⟩
   have hs : 0 < s := by
-    by_contra hnot
-    have hs0 : s = 0 := Nat.eq_zero_of_not_pos hnot
+    apply Nat.pos_of_ne_zero
+    intro hs0
     subst s
     simp at hps
-    omega
   apply unit_typeI_gate_hasDistinctDecomposition
       p (offsetD k) (offsetX m k) s hp
   · dsimp [offsetD]
