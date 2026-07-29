@@ -64,10 +64,10 @@ theorem typeI_factor_pair_hasDistinctDecomposition
     (hab : a + p * b = d * s)
     (hpd : p + d = 4 * (a * b * c)) :
     HasDistinctDecomposition p := by
-  have hac : 0 < a * c := by positivity
-  have hcs : 0 < c * s := by positivity
+  have hac : 0 < a * c := Nat.mul_pos ha hc
+  have hcs : 0 < c * s := Nat.mul_pos hc hs
   refine ⟨a * b * c, a * c * s, p * b * c * s, ?_, ?_, ?_, ?_⟩
-  · positivity
+  · omega
   · calc
       a * b * c = (a * c) * b := by ring
       _ < (a * c) * s := Nat.mul_lt_mul_of_pos_left hb_lt_s hac
