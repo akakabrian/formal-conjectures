@@ -83,4 +83,39 @@ theorem unit_typeI_gate_of_offset_dvd
   · exact hps
   · exact offset_identity p m k hpm
 
+/--
+Any divisor of `p+1` that is `3 mod 4` occurs in the complete offset sequence
+and opens a strict unit Type-I gate.
+-/
+theorem divisor_mod_four_three_hasDistinctDecomposition
+    (p m r : ℕ)
+    (hp : 1 < p)
+    (hpm : p + 3 = 4 * m)
+    (hrdvd : r ∣ p + 1)
+    (hrmod : r % 4 = 3) :
+    HasDistinctDecomposition p := by
+  have hr_le : r ≤ p + 1 := Nat.le_of_dvd (by omega) hrdvd
+  have hr_lt_p : r < p := by omega
+  have hoffset : offsetD (r / 4) = r := by
+    have hdiv := Nat.mod_add_div r 4
+    dsimp [offsetD]
+    omega
+  apply unit_typeI_gate_of_offset_dvd p m (r / 4) hp hpm
+  · simpa [hoffset] using hr_lt_p
+  · simpa [hoffset] using hrdvd
+
+/--
+A counterexample in the residual class has no divisor of `p+1` congruent to
+`3 mod 4`.
+-/
+theorem counterexample_no_divisor_mod_four_three
+    (p m : ℕ)
+    (hp : 1 < p)
+    (hpm : p + 3 = 4 * m)
+    (hcounter : ¬ HasDistinctDecomposition p) :
+    ∀ r : ℕ, r ∣ p + 1 → r % 4 ≠ 3 := by
+  intro r hrdvd hrmod
+  exact hcounter
+    (divisor_mod_four_three_hasDistinctDecomposition p m r hp hpm hrdvd hrmod)
+
 end ErdosStraus
