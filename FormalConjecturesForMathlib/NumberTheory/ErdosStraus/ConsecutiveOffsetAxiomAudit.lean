@@ -27,10 +27,12 @@ consecutive-offset theorems.
 #print axioms ErdosStraus.typeI_factor_pair_hasDistinctDecomposition
 #print axioms ErdosStraus.typeI_factor_pair_hasDistinctDecomposition_of_offset_lt
 #print axioms ErdosStraus.fixedA_typeI_gate_hasDistinctDecomposition
+#print axioms ErdosStraus.fixedA_typeI_gate_of_dvd
 #print axioms ErdosStraus.unit_typeI_gate_hasDistinctDecomposition
 #print axioms ErdosStraus.divisor_mod_eight_seven_hasDistinctDecomposition
 #print axioms ErdosStraus.counterexample_no_divisor_mod_eight_seven
 #print axioms ErdosStraus.offset_identity
+#print axioms ErdosStraus.fixedA_typeI_gate_at_offset
 #print axioms ErdosStraus.unit_typeI_gate_of_offset_dvd
 #print axioms ErdosStraus.divisor_mod_four_three_hasDistinctDecomposition
 #print axioms ErdosStraus.counterexample_no_divisor_mod_four_three
