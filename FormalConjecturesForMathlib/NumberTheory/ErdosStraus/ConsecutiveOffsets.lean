@@ -56,6 +56,28 @@ theorem offset_identity
   omega
 
 /--
+At offset `k`, a factorization `x_k=a*c` together with the divisor condition
+`d_k ∣ p+a` opens the dynamic fixed-`a` Type-I gate.
+-/
+theorem fixedA_typeI_gate_at_offset
+    (p m k a c : ℕ)
+    (hp : 0 < p) (ha : 0 < a) (hc : 0 < c) (hap : a < p)
+    (hpm : p + 3 = 4 * m)
+    (hfactor : offsetX m k = a * c)
+    (hdp : offsetD k < p)
+    (hdvd : offsetD k ∣ p + a) :
+    HasDistinctDecomposition p := by
+  apply fixedA_typeI_gate_of_dvd p a c (offsetD k) hp ha hc
+  · dsimp [offsetD]
+    omega
+  · exact hdp
+  · exact hap
+  · exact hdvd
+  · calc
+      p + offsetD k = 4 * offsetX m k := offset_identity p m k hpm
+      _ = 4 * (a * c) := by rw [hfactor]
+
+/--
 If one offset `d_k` divides `p+1`, the unit Type-I construction gives the
 exact strict-denominator Erdős–Straus decomposition at `x_k`.
 -/
