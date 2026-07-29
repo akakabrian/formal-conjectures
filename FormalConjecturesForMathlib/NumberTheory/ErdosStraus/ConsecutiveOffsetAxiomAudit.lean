@@ -26,6 +26,7 @@ consecutive-offset theorems.
 #print axioms ErdosStraus.typeI_factor_pair_identity
 #print axioms ErdosStraus.typeI_factor_pair_hasDistinctDecomposition
 #print axioms ErdosStraus.typeI_factor_pair_hasDistinctDecomposition_of_offset_lt
+#print axioms ErdosStraus.fixedA_typeI_gate_hasDistinctDecomposition
 #print axioms ErdosStraus.unit_typeI_gate_hasDistinctDecomposition
 #print axioms ErdosStraus.offset_identity
 #print axioms ErdosStraus.unit_typeI_gate_of_offset_dvd
